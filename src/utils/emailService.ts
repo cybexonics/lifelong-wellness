@@ -1,38 +1,18 @@
-// Email service utility for sending consultation and callback requests
-export interface EmailRequestData {
-  name?: string
-  fullName?: string
+// Client-side email service utility
+export interface EmailRequest {
+  name: string
   email: string
   phone: string
   concern?: string
   message?: string
-  type: "consultation" | "callback" | "contact" | "booking"
-  consultationType?: string
+  type: "consultation" | "callback"
 }
 
-export interface EmailResponse {
-  success: boolean
-  message: string
-}
-
-// Get the API base URL based on environment
-const getApiBaseUrl = () => {
-  // In production (Vercel), use relative URLs
-  if (typeof window !== "undefined" && window.location.hostname !== "localhost") {
-    return ""
-  }
-  // In development, use localhost
-  return "http://localhost:3001"
-}
-
-export const sendEmailRequest = async (data: EmailRequestData): Promise<EmailResponse> => {
+export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: boolean; message: string }> => {
   try {
-    const apiUrl = `${getApiBaseUrl()}/api/send-email`
+    console.log("Sending email request:", data)
 
-    console.log("Sending email request to:", apiUrl)
-    console.log("Request data:", data)
-
-    const response = await fetch(apiUrl, {
+    const response = await fetch("http://localhost:3001/api/send-email", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -41,33 +21,22 @@ export const sendEmailRequest = async (data: EmailRequestData): Promise<EmailRes
     })
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      const errorData = await response.json()
+      throw new Error(errorData.message || "Failed to send email")
     }
 
     const result = await response.json()
 
-    if (result.success) {
-      return {
-        success: true,
-        message: result.message || "Email sent successfully! We'll contact you soon.",
-      }
-    } else {
-      throw new Error(result.message || "Failed to send email")
+    return {
+      success: result.success,
+      message: result.message,
     }
   } catch (error) {
-    console.error("Email service error:", error)
-
-    // Provide user-friendly error messages
-    if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
-      return {
-        success: false,
-        message: "Connection error. Please check your internet connection and try again.",
-      }
-    }
-
+    console.error("Error sending email:", error)
     return {
       success: false,
-      message: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
+      message:
+        error instanceof Error ? error.message : "Failed to send request. Please try again or contact us directly.",
     }
   }
 }
