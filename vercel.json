@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "server/email-server.ts",
+      "src": "api/email-server.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/server/(.*)",
-      "dest": "server/email-server.ts"
+      "src": "/api/(.*)",
+      "dest": "api/email-server.ts"
     }
   ]
 }
