@@ -304,7 +304,7 @@ app.post(
       // Send to admin
       const adminResult = await sendWithRetry({
         from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`,
-        to: process.env.ADMIN_EMAIL || "rahulsharma18535@gmail.com",
+        to: process.env.ADMIN_EMAIL || "cybexonicsitconsultants@gmail.com",
         subject: `New ${emailData.type === 'consultation' ? 'Consultation' : 'Contact'} Request: ${emailData.fullName}`,
         html: createEmailTemplate(emailData),
         attachments

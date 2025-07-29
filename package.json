@@ -8,10 +8,10 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server:dev": "tsx watch api/email-server.ts",
+    "server:dev": "tsx watch server/email-server.ts",
     "start:backend": "npm run server:dev",
     "build:server": "tsc -p tsconfig.server.json",
-    "server": "node dist/api/email-server.js",
+    "server": "node dist/server/email-server.js",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
