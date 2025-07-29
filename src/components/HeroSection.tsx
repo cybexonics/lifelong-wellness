@@ -1,60 +1,79 @@
 "use client"
 
-import type React from "react"
-
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Heart, Phone, CheckCircle } from "lucide-react"
-import { useState } from "react"
+import { Heart, Phone, CheckCircle, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { sendEmailRequest } from "@/utils/emailService"
 import heroImage from "@/assets/hero-wellness.jpg"
+import * as z from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+
+// Form validation schema
+const formSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email"),
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  concern: z.string().min(1, "Please select a health concern"),
+  message: z.string().optional(),
+})
+
+type FormData = z.infer<typeof formSchema>
 
 const HeroSection = () => {
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    concern: "",
-    message: "",
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      concern: "",
+      message: "",
+    },
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (data: FormData) => {
     setIsLoading(true)
 
     try {
+      // First validate the phone number format
+      if (!/^[0-9]{10,}$/.test(data.phone.replace(/\D/g, ""))) {
+        throw new Error("Please enter a valid phone number")
+      }
+
       const result = await sendEmailRequest({
-        ...formData,
+        ...data,
         type: "consultation",
       })
 
       if (result.success) {
         toast({
           title: "Consultation Request Sent!",
-          description: result.message,
+          description: "We'll contact you within 24 hours to schedule your session.",
         })
-
-        // Reset form and close dialog
-        setFormData({ name: "", email: "", phone: "", concern: "", message: "" })
+        reset()
         setIsOpen(false)
       } else {
-        toast({
-          title: "Error",
-          description: result.message,
-          variant: "destructive",
-        })
+        throw new Error(result.message || "Failed to send request")
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to send consultation request. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to send consultation request",
         variant: "destructive",
       })
     } finally {
@@ -62,15 +81,15 @@ const HeroSection = () => {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-  }
-
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <img src={heroImage || "/placeholder.svg"} alt="Wellness and healing" className="w-full h-full object-cover" />
+        <img 
+          src={heroImage || "/placeholder.svg"} 
+          alt="Wellness and healing" 
+          className="w-full h-full object-cover" 
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/85 to-background/70"></div>
       </div>
 
@@ -97,7 +116,7 @@ const HeroSection = () => {
             through holistic healing.
           </p>
 
-          {/* CTA - Only Book Free Consultation button */}
+          {/* CTA */}
           <div className="flex justify-center mb-12 animate-fade-in-up">
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
               <DialogTrigger asChild>
@@ -113,60 +132,56 @@ const HeroSection = () => {
                     Book Your Consultation
                   </DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                   <div>
                     <Label htmlFor="name">Full Name *</Label>
                     <Input
                       id="name"
-                      name="name"
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={handleChange}
+                      {...register("name")}
                       placeholder="Your full name"
                       className="mt-1"
                       disabled={isLoading}
                     />
+                    {errors.name && (
+                      <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+                    )}
                   </div>
 
                   <div>
                     <Label htmlFor="email">Email Address *</Label>
                     <Input
                       id="email"
-                      name="email"
                       type="email"
-                      required
-                      value={formData.email}
-                      onChange={handleChange}
+                      {...register("email")}
                       placeholder="your.email@example.com"
                       className="mt-1"
                       disabled={isLoading}
                     />
+                    {errors.email && (
+                      <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+                    )}
                   </div>
 
                   <div>
                     <Label htmlFor="phone">Phone Number *</Label>
                     <Input
                       id="phone"
-                      name="phone"
                       type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={handleChange}
+                      {...register("phone")}
                       placeholder="+91 98765 43210"
                       className="mt-1"
                       disabled={isLoading}
                     />
+                    {errors.phone && (
+                      <p className="mt-1 text-sm text-red-500">{errors.phone.message}</p>
+                    )}
                   </div>
 
                   <div>
                     <Label htmlFor="concern">Primary Health Concern *</Label>
                     <select
                       id="concern"
-                      name="concern"
-                      required
-                      value={formData.concern}
-                      onChange={handleChange}
+                      {...register("concern")}
                       disabled={isLoading}
                       className="mt-1 w-full p-3 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
                     >
@@ -178,15 +193,16 @@ const HeroSection = () => {
                       <option value="digestive">Digestive Issues</option>
                       <option value="other">Other Health Concerns</option>
                     </select>
+                    {errors.concern && (
+                      <p className="mt-1 text-sm text-red-500">{errors.concern.message}</p>
+                    )}
                   </div>
 
                   <div>
-                    <Label htmlFor="message">Tell us about your journey</Label>
+                    <Label htmlFor="message">Tell us about your journey (Optional)</Label>
                     <Textarea
                       id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
+                      {...register("message")}
                       placeholder="Share your health journey and what you hope to achieve..."
                       rows={3}
                       className="mt-1"
@@ -194,9 +210,24 @@ const HeroSection = () => {
                     />
                   </div>
 
-                  <Button type="submit" variant="healing" size="lg" className="w-full" disabled={isLoading}>
-                    <CheckCircle className="w-5 h-5" />
-                    {isLoading ? "Sending..." : "Send Consultation Request"}
+                  <Button 
+                    type="submit" 
+                    variant="healing" 
+                    size="lg" 
+                    className="w-full" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="w-5 h-5 mr-2" />
+                        Send Consultation Request
+                      </>
+                    )}
                   </Button>
                 </form>
               </DialogContent>

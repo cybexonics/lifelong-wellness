@@ -15,7 +15,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.3.4",
+    "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-aspect-ratio": "^1.0.3",
@@ -45,6 +45,8 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@supabase/supabase-js": "^2.39.3",
     "@tanstack/react-query": "^5.28.6",
+    "@types/formidable": "^3.4.5",
+    "@vercel/node": "^5.3.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "cmdk": "^1.0.0",
@@ -54,6 +56,7 @@
     "dotenv": "^16.6.1",
     "embla-carousel-react": "^8.0.2",
     "express": "^4.21.2",
+    "formidable": "^3.5.4",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.363.0",
     "next-themes": "^0.3.0",
@@ -61,7 +64,7 @@
     "react": "^18.2.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.51.1",
+    "react-hook-form": "^7.61.1",
     "react-icons": "^5.5.0",
     "react-resizable-panels": "^2.0.16",
     "react-router-dom": "^6.22.3",
@@ -69,7 +72,8 @@
     "sonner": "^1.4.41",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
-    "vaul": "^0.9.0"
+    "vaul": "^0.9.0",
+    "zod": "^4.0.13"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

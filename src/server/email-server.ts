@@ -5,37 +5,50 @@ import nodemailer from "nodemailer";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Load environment variables
 dotenv.config();
 
+// Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Configure allowed origins
+// Configure allowed origins (development + production)
 const allowedOrigins = [
   "http://localhost:8080",
   "http://localhost:3000",
   "http://localhost:5173",
   "http://localhost:8081",
+  "https://lifelong-wellness.vercel.app",
+  /https:\/\/lifelong-wellness-.*\.vercel\.app/,
+  /https:\/\/lifelong-wellness-git-.*\.vercel\.app/
 ];
 
 // Enhanced CORS configuration
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // Allow requests with no origin
       
-      if (allowedOrigins.indexOf(origin) !== -1) {
+      // Check against allowed origins
+      const isAllowed = allowedOrigins.some(allowed => {
+        if (typeof allowed === 'string') {
+          return origin === allowed;
+        }
+        return allowed.test(origin);
+      });
+
+      if (isAllowed) {
         callback(null, true);
       } else {
+        console.log('Blocked by CORS:', origin);
         callback(new Error(`Origin ${origin} not allowed by CORS`));
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
 
@@ -43,8 +56,8 @@ app.use(
 app.options("*", cors());
 
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -61,140 +74,131 @@ const storage = multer.diskStorage({
       null,
       file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
     );
-  },
+  }
 });
 
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 10 * 1024 * 1024 // 10MB limit
   },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
+    const allowedTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'application/pdf'
+    ];
+    
+    if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error("Only image files are allowed!"), false);
+      cb(new Error('Only images (JPEG, PNG, GIF) and PDFs are allowed'));
     }
-  },
-});
-
-// Create transporter
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER || "your-email@gmail.com",
-    pass: process.env.EMAIL_PASS || "your-app-password",
-  },
-});
-
-// Verify transporter
-transporter.verify((error, success) => {
-  if (error) {
-    console.log("❌ Email transporter error:", error);
-  } else {
-    console.log("✅ Email server is ready to send messages");
   }
 });
 
-// Helper function to create professional email template
-const createEmailTemplate = (data: any, type: string) => {
-  const isConsultation = type === "consultation";
-  const title = isConsultation
-    ? "New Consultation Request"
-    : "New Contact Form Submission";
+// Email transporter with enhanced configuration
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  },
+  tls: {
+    ciphers: 'SSLv3',
+    rejectUnauthorized: false // Only for development/testing
+  },
+  connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 5000,    // 5 seconds
+  socketTimeout: 10000      // 10 seconds
+});
+
+// Verify transporter with retry logic
+const verifyTransporter = async (attempts = 3): Promise<void> => {
+  try {
+    await transporter.verify();
+    console.log("✅ SMTP connection verified");
+  } catch (error) {
+    console.error(`❌ SMTP verification failed (attempt ${4 - attempts}/3):`, error);
+    if (attempts > 1) {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      return verifyTransporter(attempts - 1);
+    }
+    throw new Error("Failed to verify SMTP connection after 3 attempts");
+  }
+};
+
+verifyTransporter().catch(err => {
+  console.error("Critical SMTP error:", err);
+});
+
+// Email template functions with TypeScript interfaces
+interface EmailData {
+  fullName: string;
+  email: string;
+  phone: string;
+  message?: string;
+  consultationType?: string;
+  type: 'consultation' | 'contact' | 'callback';
+}
+
+const createEmailTemplate = (data: EmailData): string => {
+  const isConsultation = data.type === "consultation";
+  const title = isConsultation ? "New Consultation Request" : "New Contact Form Submission";
 
   return `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${title}</title>
       <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f8f9fa; }
-        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px 20px; text-align: center; }
-        .header h1 { margin: 0; font-size: 24px; font-weight: 600; }
-        .content { padding: 30px 20px; }
-        .field { margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #10b981; }
-        .field-label { font-weight: 600; color: #059669; margin-bottom: 5px; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
-        .field-value { color: #333; font-size: 16px; }
-        .footer { background: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e9ecef; }
-        .priority { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 10px 20px; border-radius: 25px; display: inline-block; font-weight: 600; margin-bottom: 20px; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 25px; text-align: center; }
+        .content { padding: 20px; }
+        .field { margin-bottom: 15px; padding: 15px; background: #f8fafc; border-radius: 6px; border-left: 4px solid #10b981; }
+        .field-label { font-weight: 600; color: #047857; margin-bottom: 5px; font-size: 14px; }
+        .field-value { color: #1e293b; font-size: 15px; }
+        .priority-tag { background: #ef4444; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; display: inline-block; margin-left: 8px; }
+        .footer { background: #f8fafc; padding: 15px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b; }
       </style>
     </head>
     <body>
       <div class="container">
         <div class="header">
-          <h1>🌿 Lifelong Wellness</h1>
-          <p style="margin: 10px 0 0 0; opacity: 0.9;">${title}</p>
+          <h2>🌿 Lifelong Wellness</h2>
+          <p>${title} ${isConsultation ? '<span class="priority-tag">PRIORITY</span>' : ''}</p>
         </div>
         <div class="content">
-          ${
-            isConsultation
-              ? '<div class="priority">🚨 PRIORITY: Consultation Request</div>'
-              : ""
-          }
-          
           <div class="field">
-            <div class="field-label">Full Name</div>
-            <div class="field-value">${
-              data.fullName || `${data.name || ""} ${data.surname || ""}`.trim()
-            }</div>
+            <div class="field-label">Client Name</div>
+            <div class="field-value">${data.fullName}</div>
           </div>
-          
           <div class="field">
-            <div class="field-label">Email Address</div>
+            <div class="field-label">Contact Email</div>
             <div class="field-value">${data.email}</div>
           </div>
-          
           <div class="field">
             <div class="field-label">Phone Number</div>
             <div class="field-value">${data.phone}</div>
           </div>
-          
-          ${
-            data.consultationType
-              ? `
+          ${data.consultationType ? `
           <div class="field">
             <div class="field-label">Consultation Type</div>
             <div class="field-value">${data.consultationType}</div>
-          </div>
-          `
-              : ""
-          }
-          
-          ${
-            data.message
-              ? `
+          </div>` : ''}
+          ${data.message ? `
           <div class="field">
-            <div class="field-label">Message / Health Concerns</div>
-            <div class="field-value">${data.message}</div>
-          </div>
-          `
-              : ""
-          }
-          
-          ${
-            data.type === "consultation"
-              ? `
-          <div class="field">
-            <div class="field-label">Request Type</div>
-            <div class="field-value">50% OFF Consultation Booking</div>
-          </div>
-          `
-              : ""
-          }
+            <div class="field-label">Message</div>
+            <div class="field-value">${data.message.replace(/\n/g, '<br>')}</div>
+          </div>` : ''}
         </div>
         <div class="footer">
-          <p style="margin: 0; color: #6b7280;">
-            📧 Received at: ${new Date().toLocaleString("en-IN", {
-              timeZone: "Asia/Kolkata",
-            })}
-          </p>
-          <p style="margin: 10px 0 0 0; color: #6b7280; font-size: 14px;">
-            Please respond within 24 hours for consultation requests
-          </p>
+          Received at: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
         </div>
       </div>
     </body>
@@ -202,88 +206,50 @@ const createEmailTemplate = (data: any, type: string) => {
   `;
 };
 
-// Helper function for auto-reply email
-const createAutoReplyTemplate = (data: any, type: string) => {
-  const isConsultation = type === "consultation";
-  const name = data.fullName || `${data.name || ""} ${data.surname || ""}`.trim();
+const createAutoReplyTemplate = (data: EmailData): string => {
+  const isConsultation = data.type === "consultation";
+  const name = data.fullName.split(' ')[0] || data.fullName;
 
   return `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Thank You - Lifelong Wellness</title>
       <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f8f9fa; }
-        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px 20px; text-align: center; }
-        .content { padding: 30px 20px; }
-        .highlight { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 15px 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
-        .contact-info { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
-        .footer { background: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e9ecef; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 25px; text-align: center; }
+        .content { padding: 20px; }
+        .highlight-box { background: #ecfdf5; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #10b981; }
+        .footer { background: #f8fafc; padding: 15px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b; }
       </style>
     </head>
     <body>
       <div class="container">
         <div class="header">
-          <h1>🌿 Lifelong Wellness</h1>
-          <p style="margin: 10px 0 0 0; opacity: 0.9;">Thank You for Reaching Out!</p>
+          <h2>🌿 Lifelong Wellness</h2>
+          <p>Thank You for Contacting Us</p>
         </div>
         <div class="content">
-          <h2 style="color: #059669; margin-bottom: 20px;">Dear ${name},</h2>
+          <p>Dear ${name},</p>
           
-          <p>Thank you for your interest in our holistic wellness services! We have received your ${
-            isConsultation ? "consultation request" : "message"
-          } and are excited to help you on your journey to optimal health.</p>
-          
-          ${
-            isConsultation
-              ? `
-          <div class="highlight">
-            <h3 style="margin: 0 0 10px 0;">🎉 Your 50% OFF Consultation is Reserved!</h3>
-            <p style="margin: 0;">We'll contact you within 24 hours to schedule your personalized consultation.</p>
-          </div>
-          `
-              : `
-          <div class="highlight">
-            <h3 style="margin: 0 0 10px 0;">📞 We'll Be In Touch Soon!</h3>
-            <p style="margin: 0;">Our team will respond to your inquiry within 2 hours.</p>
-          </div>
-          `
-          }
-          
-          <h3 style="color: #059669;">What Happens Next?</h3>
-          <ul style="padding-left: 20px;">
-            <li>Our wellness coordinator will contact you shortly</li>
-            <li>We'll discuss your health goals and concerns</li>
-            <li>Schedule your ${
-              isConsultation ? "discounted consultation" : "appointment"
-            } at your convenience</li>
-            <li>Begin your personalized healing journey</li>
-          </ul>
-          
-          <div class="contact-info">
-            <h4 style="color: #059669; margin-bottom: 15px;">📞 Contact Information</h4>
-            <p><strong>Phone:</strong> +91 94210 69326</p>
-            <p><strong>WhatsApp:</strong> +91 94210 69326 (24x7 Support)</p>
-            <p><strong>Email:</strong>meghahshaha@gmail.com</p>
-            <p><strong>Working Hours:</strong> Mon-Sat: 9 AM - 7 PM, Sun: 10 AM - 4 PM</p>
+          <div class="highlight-box">
+            <p>We've received your ${isConsultation ? 'consultation request' : 'message'} and will respond within 24 hours.</p>
+            ${isConsultation ? '<p><strong>Your 50% OFF consultation is confirmed!</strong></p>' : ''}
           </div>
           
-          <p>If you have any urgent questions, please don't hesitate to call or WhatsApp us directly.</p>
+          <p>For immediate assistance, please contact us at:</p>
+          <p><strong>Phone/WhatsApp:</strong> +91 94210 69326</p>
+          <p><strong>Email:</strong> meghahshaha@gmail.com</p>
           
-          <p style="margin-top: 30px;">
-            Warm regards,<br>
-            <strong>Dr. Megha Shaha</strong><br>
-            <em>Holistic Wellness Practitioner</em><br>
-            Lifelong Wellness
-          </p>
+          <p>We appreciate your interest in our holistic wellness services and look forward to helping you on your health journey.</p>
+          
+          <p>Warm regards,<br>
+          <strong>Dr. Megha Shaha</strong><br>
+          Holistic Wellness Practitioner</p>
         </div>
         <div class="footer">
-          <p style="margin: 0; color: #6b7280; font-size: 14px;">
-            This is an automated response. Please do not reply to this email.
-          </p>
+          This is an automated message. Please do not reply directly to this email.
         </div>
       </div>
     </body>
@@ -291,186 +257,179 @@ const createAutoReplyTemplate = (data: any, type: string) => {
   `;
 };
 
-// API endpoint for sending emails
+// API endpoint for sending emails with enhanced error handling
 app.post(
   "/api/send-email",
   upload.single("paymentScreenshot"),
   async (req, res) => {
     try {
-      console.log("📧 Received email request:", req.body);
-      console.log("📎 File uploaded:", req.file ? req.file.filename : "No file");
-
-      const {
-        name,
-        surname,
-        fullName,
-        email,
-        phone,
-        message,
-        consultationType,
-        type,
-      } = req.body;
-
       // Validate required fields
-      if (!email || !phone) {
+      if (!req.body.email || !req.body.phone) {
         return res.status(400).json({
           success: false,
-          message: "Email and phone are required fields",
+          message: "Email and phone number are required"
         });
       }
-
-      // Determine email type
-      const emailType =
-        type === "consultation" || consultationType ? "consultation" : "contact";
 
       // Prepare email data
-      const emailData = {
-        fullName: fullName || `${name || ""} ${surname || ""}`.trim(),
-        email,
-        phone,
-        message: message || "",
-        consultationType: consultationType || "",
-        type,
+      const emailData: EmailData = {
+        fullName: req.body.fullName || `${req.body.name || ''} ${req.body.surname || ''}`.trim(),
+        email: req.body.email,
+        phone: req.body.phone,
+        message: req.body.message || req.body.concern || '',
+        consultationType: req.body.consultationType || '',
+        type: req.body.type || 'contact'
       };
 
-      // Email options for admin
-      const adminMailOptions = {
-        from: process.env.EMAIL_USER || "your-email@gmail.com",
-        to: "meghahshaha@gmail.com",
-        subject:
-          emailType === "consultation"
-            ? `🚨 NEW CONSULTATION REQUEST - ${emailData.fullName}`
-            : `📧 New Contact Form Submission - ${emailData.fullName}`,
-        html: createEmailTemplate(emailData, emailType),
-        attachments: [],
+      // Prepare attachments if file was uploaded
+      const attachments = req.file ? [{
+        filename: req.file.originalname,
+        path: req.file.path
+      }] : [];
+
+      // Send email with retry logic
+      const sendWithRetry = async (mailOptions: any, retries = 3) => {
+        try {
+          return await transporter.sendMail(mailOptions);
+        } catch (error) {
+          if (retries > 0) {
+            console.log(`Retrying email (${retries} attempts left)...`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            return sendWithRetry(mailOptions, retries - 1);
+          }
+          throw error;
+        }
       };
 
-      // Add payment screenshot if uploaded
+      // Send to admin
+      const adminResult = await sendWithRetry({
+        from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`,
+        to: process.env.ADMIN_EMAIL || "rahulsharma18535@gmail.com",
+        subject: `New ${emailData.type === 'consultation' ? 'Consultation' : 'Contact'} Request: ${emailData.fullName}`,
+        html: createEmailTemplate(emailData),
+        attachments
+      });
+
+      // Send auto-reply to client
+      const autoReplyResult = await sendWithRetry({
+        from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`,
+        to: emailData.email,
+        subject: emailData.type === 'consultation' 
+          ? "Your Consultation Request Received" 
+          : "Thank You for Contacting Us",
+        html: createAutoReplyTemplate(emailData)
+      });
+
+      // Clean up uploaded file
       if (req.file) {
-        adminMailOptions.attachments.push({
-          filename: `payment-screenshot-${emailData.fullName.replace(
-            /\s+/g,
-            "-"
-          )}.${req.file.originalname.split(".").pop()}`,
-          path: req.file.path,
+        fs.unlink(req.file.path, (err) => {
+          if (err) console.error("Error deleting file:", err);
         });
       }
 
-      // Auto-reply email options
-      const autoReplyOptions = {
-        from: process.env.EMAIL_USER || "your-email@gmail.com",
-        to: email,
-        subject:
-          emailType === "consultation"
-            ? "🌿 Your Consultation Request Received - Lifelong Wellness"
-            : "🌿 Thank You for Contacting Us - Lifelong Wellness",
-        html: createAutoReplyTemplate(emailData, emailType),
-      };
-
-      // Send admin email
-      const adminResult = await transporter.sendMail(adminMailOptions);
-      console.log("✅ Admin email sent:", adminResult.messageId);
-
-      // Send auto-reply email
-      const autoReplyResult = await transporter.sendMail(autoReplyOptions);
-      console.log("✅ Auto-reply sent:", autoReplyResult.messageId);
-
-      // Clean up uploaded file after sending email
-      if (req.file) {
-        setTimeout(() => {
-          fs.unlink(req.file.path, (err) => {
-            if (err) console.log("Error deleting file:", err);
-            else console.log("✅ Uploaded file cleaned up");
-          });
-        }, 5000); // Delete after 5 seconds
-      }
-
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "Email sent successfully",
-        adminMessageId: adminResult.messageId,
-        autoReplyMessageId: autoReplyResult.messageId,
+        data: {
+          adminMessageId: adminResult.messageId,
+          autoReplyMessageId: autoReplyResult.messageId
+        }
       });
-    } catch (error) {
-      console.error("❌ Email sending error:", error);
-      res.status(500).json({
+
+    } catch (error: any) {
+      console.error("Email sending error:", error);
+
+      // Clean up file if exists
+      if (req.file) {
+        fs.unlink(req.file.path, (err) => {
+          if (err) console.error("Error deleting file:", err);
+        });
+      }
+
+      return res.status(500).json({
         success: false,
         message: "Failed to send email",
-        error: error.message,
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   }
 );
 
-// Health check endpoint
-app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    status: "OK",
-    message: "Email server is running",
-    timestamp: new Date().toISOString(),
-  });
-});
-
-// Test email endpoint
-app.get("/api/test-email", async (req, res) => {
+// Enhanced health check endpoint
+app.get("/api/health", async (req, res) => {
   try {
-    const testMailOptions = {
-      from: process.env.EMAIL_USER || "your-email@gmail.com",
-      to: "rahulsharma18535@gmail.com",
-      subject: "🧪 Test Email - Lifelong Wellness Server",
-      html: `
-        <h2>✅ Email Server Test</h2>
-        <p>This is a test email to verify the email server is working correctly.</p>
-        <p><strong>Timestamp:</strong> ${new Date().toLocaleString("en-IN", {
-          timeZone: "Asia/Kolkata",
-        })}</p>
-        <p><strong>Server Status:</strong> Running</p>
-      `,
-    };
-
-    const result = await transporter.sendMail(testMailOptions);
-    console.log("✅ Test email sent:", result.messageId);
-
+    // Test email connectivity
+    await transporter.verify();
+    
     res.status(200).json({
-      success: true,
-      message: "Test email sent successfully",
-      messageId: result.messageId,
+      status: "healthy",
+      timestamp: new Date().toISOString(),
+      service: "email-server",
+      version: process.env.npm_package_version || "1.0.0",
+      environment: process.env.NODE_ENV || "development"
     });
   } catch (error) {
-    console.error("❌ Test email error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to send test email",
-      error: error.message,
+    res.status(503).json({
+      status: "unhealthy",
+      error: "Email service unavailable",
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
 
 // Error handling middleware
-app.use(
-  (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error("Server error:", err);
-    res.status(500).json({
+app.use((
+  err: any,
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  console.error("Server error:", err);
+
+  // Handle specific error types
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({
+        success: false,
+        message: "File too large. Maximum size is 10MB"
+      });
+    }
+    return res.status(400).json({
       success: false,
-      message: "Internal server error",
+      message: "File upload error",
+      error: err.message
     });
   }
-);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Email server running on http://localhost:${PORT}`);
-  console.log(`📧 Admin email: rahulsharma18535@gmail.com`);
-  console.log(`🔧 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`🧪 Test email: http://localhost:${PORT}/api/test-email`);
-
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.warn(
-      "⚠️  WARNING: Email credentials not configured. Please set EMAIL_USER and EMAIL_PASS in .env file"
-    );
-  } else {
-    console.log(`✅ Email configured for: ${process.env.EMAIL_USER}`);
+  if (err.message.includes('CORS')) {
+    return res.status(403).json({
+      success: false,
+      message: "Request blocked by CORS policy"
+    });
   }
+
+  // Generic error response
+  res.status(500).json({
+    success: false,
+    message: "Internal server error",
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
 });
 
-export default app;
+// Start local server if not in production
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`📧 Email service: ${process.env.EMAIL_USER}`);
+    console.log(`🔧 Health check: http://localhost:${PORT}/api/health`);
+  });
+}
+
+// Export for Vercel
+export default async (req: VercelRequest, res: VercelResponse) => {
+  // Add Vercel-specific headers if needed
+  res.setHeader('X-Powered-By', 'Vercel');
+  
+  // Forward to Express app
+  return app(req, res);
+};

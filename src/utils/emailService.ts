@@ -7,68 +7,69 @@ export interface EmailRequest {
   concern?: string;
   message?: string;
   consultationType?: string;
-  type: "consultation" | "callback" | "contact";
+  type: 'consultation' | 'callback' | 'contact';
+  paymentScreenshot?: File;
 }
+
+// Determine API base URL based on environment
+const getApiBaseUrl = () => {
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3000/api';
+  }
+  return process.env.REACT_APP_API_BASE_URL || 'https://your-vercel-app.vercel.app/api';
+};
 
 export const sendEmailRequest = async (
   data: EmailRequest
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    console.log("Sending email request:", data);
+    const formData = new FormData();
 
-    // Prepare the complete request body
-    const requestBody = {
-      name: data.name || "",
-      surname: data.surname || "",
-      fullName: data.fullName || `${data.name || ""} ${data.surname || ""}`.trim(),
-      email: data.email,
-      phone: data.phone,
-      message: data.message || data.concern || "",
-      consultationType: data.consultationType || "",
-      type: data.type,
-    };
+    // Append all fields to FormData
+    if (data.name) formData.append('name', data.name);
+    if (data.surname) formData.append('surname', data.surname);
+    if (data.fullName) formData.append('fullName', data.fullName);
+    formData.append('email', data.email);
+    formData.append('phone', data.phone);
+    if (data.message) formData.append('message', data.message);
+    if (data.concern) formData.append('concern', data.concern);
+    if (data.consultationType) formData.append('consultationType', data.consultationType);
+    formData.append('type', data.type);
+    if (data.paymentScreenshot) {
+      formData.append('paymentScreenshot', data.paymentScreenshot);
+    }
 
-    const response = await fetch("http://localhost:3001/api/send-email", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
+    const response = await fetch(`${getApiBaseUrl()}/send-email`, {
+      method: 'POST',
+      body: formData,
+      // Don't set Content-Type header when using FormData
+      // The browser will set it automatically with the correct boundary
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to send email");
+      throw new Error(errorData.message || 'Failed to send email');
     }
 
-    const result = await response.json();
-
-    return {
-      success: result.success,
-      message: result.message,
-    };
-  } catch (error) {
-    console.error("Error sending email:", error);
-    return {
-      success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Failed to send request. Please try again or contact us directly.",
-    };
+    return await response.json();
+  } catch (error: any) {
+    console.error('Email sending error:', error);
+    throw new Error(
+      error.message || 'Failed to send request. Please try again or contact us directly.'
+    );
   }
 };
 
-// Utility function to check if server is running
-export const checkServerHealth = async () => {
+// Utility function to check server connection
+export const checkServerConnection = async () => {
   try {
-    const response = await fetch("http://localhost:3001/api/health");
+    const response = await fetch(`${getApiBaseUrl()}/health`);
     if (!response.ok) {
-      throw new Error("Server not healthy");
+      throw new Error('Server not responding');
     }
     return await response.json();
   } catch (error) {
-    console.error("Health check failed:", error);
+    console.error('Server connection check failed:', error);
     throw error;
   }
 };
