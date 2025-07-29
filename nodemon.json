@@ -1,0 +1,9 @@
+{
+  "watch": ["src/server"],
+  "ext": "ts,js",
+  "ignore": ["src/server/**/*.spec.ts"],
+  "exec": "node --loader ts-node/esm src/server/email-server.ts",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}
