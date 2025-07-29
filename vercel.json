@@ -8,7 +8,7 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
+      "src": "/api/email-server.ts",
       "dest": "api/email-server.ts"
     }
   ]
