@@ -1,72 +1,42 @@
-interface EmailRequest {
-  name?: string;
-  surname?: string;
-  fullName?: string;
-  email: string;
-  phone: string;
-  message?: string;
-  consultationType?: string;
-  type: 'consultation' | 'callback';
-  paymentScreenshot?: File;
+// Client-side email service utility
+export interface EmailRequest {
+  name: string
+  email: string
+  phone: string
+  concern?: string
+  message?: string
+  type: "consultation" | "callback"
 }
 
-export const sendEmailRequest = async (data: EmailRequest): Promise<{ 
-  success: boolean; 
-  message: string;
-  adminMessageId?: string;
-  autoReplyMessageId?: string;
-}> => {
+export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: boolean; message: string }> => {
   try {
-    const formData = new FormData();
-    
-    // Append all data fields
-    for (const [key, value] of Object.entries(data)) {
-      if (key !== 'paymentScreenshot' && value !== undefined) {
-        formData.append(key, String(value));
-      }
-    }
+    console.log("Sending email request:", data)
 
-    // Append file if exists
-    if (data.paymentScreenshot) {
-      formData.append('paymentScreenshot', data.paymentScreenshot);
-    }
-
-    const response = await fetch('/api/send-email', {
-      method: 'POST',
-      body: formData,
-      // Headers are automatically set by browser for FormData
-    });
-
-    const result = await response.json();
+    const response = await fetch("http://localhost:3001/api/send-email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
 
     if (!response.ok) {
-      throw new Error(result.message || 'Failed to send email');
+      const errorData = await response.json()
+      throw new Error(errorData.message || "Failed to send email")
     }
 
+    const result = await response.json()
+
     return {
-      success: true,
+      success: result.success,
       message: result.message,
-      adminMessageId: result.adminMessageId,
-      autoReplyMessageId: result.autoReplyMessageId,
-    };
-  } catch (error: any) {
-    console.error('Error sending email:', error);
+    }
+  } catch (error) {
+    console.error("Error sending email:", error)
     return {
       success: false,
-      message: error.message || 'Failed to send request. Please try again or contact us directly.',
-    };
+      message:
+        error instanceof Error ? error.message : "Failed to send request. Please try again or contact us directly.",
+    }
   }
-};
-
-// Helper function to use in your components
-export const handleEmailSubmit = async (formData: EmailRequest) => {
-  const result = await sendEmailRequest(formData);
-  
-  if (result.success) {
-    console.log('Email sent successfully:', result);
-    return { success: true, message: 'Your message has been sent successfully!' };
-  } else {
-    console.error('Failed to send email:', result.message);
-    return { success: false, message: result.message };
-  }
-};
+}
