@@ -11,13 +11,8 @@ export interface EmailRequest {
   paymentScreenshot?: File
 }
 
-// Use the current Vercel deployment URL instead of the custom domain
-const API_BASE_URL =
-  typeof window !== "undefined"
-    ? window.location.origin // Use the current origin (works for all Vercel deployments)
-    : process.env.NODE_ENV === "production"
-      ? "https://lifelong-wellness-ftia-54wwept5g.vercel.app" // Your current deployment
-      : "http://localhost:3000"
+// Use your actual domain
+const API_BASE_URL = "https://www.lifelongwellness.co.in"
 
 console.log("API_BASE_URL:", API_BASE_URL)
 
@@ -88,7 +83,7 @@ export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: b
 
 export const checkServerConnection = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/health`)
+    const response = await fetch(`${API_BASE_URL}/api/test`)
     if (!response.ok) {
       throw new Error("Server not responding")
     }

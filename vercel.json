@@ -3,7 +3,7 @@
     "api/send-email.ts": {
       "maxDuration": 30
     },
-    "api/health.ts": {
+    "api/test.ts": {
       "maxDuration": 10
     }
   }
