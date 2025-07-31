@@ -14,20 +14,27 @@ const allowedOrigins = [
   "https://lifelongwellness.co.in",
 ]
 
-// Email transporter configuration
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-})
+// Email transporter configuration - Fixed typo: createTransport not createTransporter
+const createTransporter = () => {
+  try {
+    return nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    })
+  } catch (error) {
+    console.error("Failed to create email transporter:", error)
+    throw new Error("Email configuration error")
+  }
+}
 
 // Email template functions
 const createEmailTemplate = (data: {
@@ -39,7 +46,6 @@ const createEmailTemplate = (data: {
   type: "consultation" | "contact" | "callback"
 }): string => {
   const isConsultation = data.type === "consultation"
-
   return `
     <!DOCTYPE html>
     <html>
@@ -100,7 +106,6 @@ const createAutoReplyTemplate = (data: {
 }): string => {
   const isConsultation = data.type === "consultation"
   const firstName = data.fullName.split(" ")[0] || data.fullName
-
   return `
     <!DOCTYPE html>
     <html>
@@ -140,56 +145,80 @@ const createAutoReplyTemplate = (data: {
   `
 }
 
-// Parse form data
+// Parse form data with better error handling
 const parseForm = (req: VercelRequest): Promise<{ fields: any; files: any }> => {
   return new Promise((resolve, reject) => {
-    const form = formidable({
-      maxFileSize: 10 * 1024 * 1024, // 10MB
-      allowEmptyFiles: false,
-      filter: ({ mimetype }) => {
-        return mimetype && ["image/jpeg", "image/png", "image/gif", "application/pdf"].includes(mimetype)
-      },
-    })
+    try {
+      const form = formidable({
+        maxFileSize: 10 * 1024 * 1024, // 10MB
+        allowEmptyFiles: false,
+        filter: ({ mimetype }) => {
+          return !!(mimetype && ["image/jpeg", "image/png", "image/gif", "application/pdf"].includes(mimetype))
+        },
+      })
 
-    form.parse(req, (err, fields, files) => {
-      if (err) reject(err)
-      else resolve({ fields, files })
-    })
+      form.parse(req, (err, fields, files) => {
+        if (err) {
+          console.error("Form parsing error:", err)
+          reject(new Error(`Form parsing failed: ${err.message}`))
+        } else {
+          resolve({ fields, files })
+        }
+      })
+    } catch (error) {
+      console.error("Form setup error:", error)
+      reject(new Error("Failed to setup form parser"))
+    }
   })
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Handle CORS
-  const origin = req.headers.origin
-  const isAllowedOrigin =
-    origin &&
-    (allowedOrigins.includes(origin) ||
-      /https:\/\/lifelong-wellness-.*\.vercel\.app/.test(origin) ||
-      /https:\/\/lifelong-wellness-git-.*\.vercel\.app/.test(origin))
-
-  if (isAllowedOrigin) {
-    res.setHeader("Access-Control-Allow-Origin", origin)
-  }
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
-  res.setHeader("Access-Control-Allow-Credentials", "true")
-
-  // Handle preflight requests
-  if (req.method === "OPTIONS") {
-    return res.status(200).end()
-  }
-
-  // Only allow POST requests
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      success: false,
-      message: "Method not allowed",
-    })
-  }
+  console.log("Email handler called with method:", req.method)
 
   try {
+    // Validate environment variables
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.error("Missing email credentials")
+      return res.status(500).json({
+        success: false,
+        message: "Email service not configured",
+      })
+    }
+
+    // Handle CORS
+    const origin = req.headers.origin
+    const isAllowedOrigin =
+      origin &&
+      (allowedOrigins.includes(origin) ||
+        /https:\/\/lifelong-wellness-.*\.vercel\.app/.test(origin) ||
+        /https:\/\/lifelong-wellness-git-.*\.vercel\.app/.test(origin))
+
+    if (isAllowedOrigin) {
+      res.setHeader("Access-Control-Allow-Origin", origin)
+    }
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
+    res.setHeader("Access-Control-Allow-Credentials", "true")
+
+    // Handle preflight requests
+    if (req.method === "OPTIONS") {
+      return res.status(200).end()
+    }
+
+    // Only allow POST requests
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        success: false,
+        message: "Method not allowed",
+      })
+    }
+
+    console.log("Parsing form data...")
+
     // Parse form data
     const { fields, files } = await parseForm(req)
+
+    console.log("Form parsed successfully, fields:", Object.keys(fields))
 
     // Extract fields (formidable returns arrays for fields)
     const getField = (field: any) => (Array.isArray(field) ? field[0] : field)
@@ -199,6 +228,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Validate required fields
     if (!email || !phone) {
+      console.error("Missing required fields:", { email: !!email, phone: !!phone })
       return res.status(400).json({
         success: false,
         message: "Email and phone are required fields",
@@ -212,28 +242,51 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       phone,
       message: getField(fields.message) || getField(fields.concern) || "",
       consultationType: getField(fields.consultationType) || "",
-      type: getField(fields.type) || "contact",
+      type: (getField(fields.type) || "contact") as "consultation" | "contact" | "callback",
     }
 
+    console.log("Email data prepared:", { ...emailData, email: "***", phone: "***" })
+
     // Handle file attachment
-    let attachment = null
+    let attachment: { filename: string; path: string } | null = null
     if (files.paymentScreenshot) {
       const file = Array.isArray(files.paymentScreenshot) ? files.paymentScreenshot[0] : files.paymentScreenshot
-
       if (file && file.filepath) {
         attachment = {
           filename: file.originalFilename || "payment-screenshot",
           path: file.filepath,
         }
+        console.log("Attachment found:", attachment.filename)
       }
     }
 
+    // Create transporter
+    console.log("Creating email transporter...")
+    const transporter = createTransporter()
+
+    // Verify transporter configuration
+    try {
+      await transporter.verify()
+      console.log("Email transporter verified successfully")
+    } catch (verifyError) {
+      console.error("Email transporter verification failed:", verifyError)
+      return res.status(500).json({
+        success: false,
+        message: "Email service configuration error",
+      })
+    }
+
     // Send email with retry logic
-    const sendWithRetry = async (mailOptions: any, retries = 3): Promise<any> => {
+    const sendWithRetry = async (mailOptions: any, retries = 2): Promise<any> => {
       try {
-        return await transporter.sendMail(mailOptions)
-      } catch (error) {
+        console.log("Attempting to send email, retries left:", retries)
+        const result = await transporter.sendMail(mailOptions)
+        console.log("Email sent successfully:", result.messageId)
+        return result
+      } catch (error: any) {
+        console.error("Email send error:", error.message)
         if (retries > 0) {
+          console.log("Retrying email send...")
           await new Promise((resolve) => setTimeout(resolve, 2000))
           return sendWithRetry(mailOptions, retries - 1)
         }
@@ -242,15 +295,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Send to admin
+    console.log("Sending email to admin...")
     await sendWithRetry({
       from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`,
       to: process.env.ADMIN_EMAIL || "meghahshaha@gmail.com",
       subject: `New ${emailData.type === "consultation" ? "Consultation" : "Contact"} Request`,
       html: createEmailTemplate(emailData),
-      attachments: attachment ? [attachment] : [],
+      attachments: attachment ? [attachment] : undefined,
     })
 
     // Send auto-reply
+    console.log("Sending auto-reply...")
     await sendWithRetry({
       from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`,
       to: emailData.email,
@@ -259,21 +314,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
 
     // Clean up uploaded file
-    if (attachment && attachment.path) {
+    if (attachment?.path) {
       try {
         fs.unlinkSync(attachment.path)
+        console.log("Temporary file cleaned up")
       } catch (cleanupError) {
         console.error("File cleanup error:", cleanupError)
       }
     }
 
+    console.log("Email process completed successfully")
     return res.status(200).json({
       success: true,
       message: "Email sent successfully",
     })
   } catch (error: any) {
-    console.error("Email error:", error)
-
+    console.error("Handler error:", error)
     return res.status(500).json({
       success: false,
       message: "Failed to send email",
