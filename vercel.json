@@ -1,0 +1,11 @@
+{
+  "functions": {
+    "api/send-email.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "EMAIL_USER": "rahulsharma18535@gmail.com",
+    "EMAIL_PASS": "dvsi vxuw btqq cplg"
+  }
+}
