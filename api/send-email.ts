@@ -21,6 +21,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:8081",
   "https://lifelong-wellness.vercel.app",
+  "https://www.lifelongwellness.co.in",
+  "https://lifelongwellness.co.in",
   /https:\/\/lifelong-wellness-.*\.vercel\.app/,
   /https:\/\/lifelong-wellness-git-.*\.vercel\.app/
 ];
@@ -337,6 +339,9 @@ if (process.env.NODE_ENV !== 'production') {
 // Vercel serverless function handler
 export default async (req: VercelRequest, res: VercelResponse) => {
   // Add Vercel-specific headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('X-Powered-By', 'Vercel');
   
   // Forward to Express app
