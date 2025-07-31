@@ -1,10 +1,13 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node"
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Set CORS headers for your domain
+  console.log(`[${new Date().toISOString()}] API called from:`, req.headers.origin || req.headers.referer)
+
+  // Set CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*")
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type")
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
+  res.setHeader("Access-Control-Allow-Credentials", "true")
 
   if (req.method === "OPTIONS") {
     return res.status(200).end()
@@ -15,99 +18,78 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Step 1: Basic test - can we return a response?
     console.log("Step 1: Handler started")
 
-    // Step 2: Check environment variables exist
-    console.log("Step 2: Checking env vars")
-    console.log("EMAIL_USER exists:", !!process.env.EMAIL_USER)
-    console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS)
-
+    // Check environment variables
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      return res.status(400).json({
+      console.error("Missing environment variables")
+      return res.status(500).json({
         error: "Missing environment variables",
         hasEmailUser: !!process.env.EMAIL_USER,
         hasEmailPass: !!process.env.EMAIL_PASS,
       })
     }
 
-    // Step 3: Try to get request body
-    console.log("Step 3: Getting request body")
-    const body = req.body || {}
-    console.log("Body:", body)
+    console.log("Step 2: Environment variables OK")
 
-    // Step 4: Check required fields
+    // Get request body
+    const body = req.body || {}
+    console.log("Step 3: Request body received:", Object.keys(body))
+
+    // Check required fields
     if (!body.email || !body.phone) {
       return res.status(400).json({
         error: "Missing email or phone",
-        received: body,
+        received: { email: !!body.email, phone: !!body.phone },
       })
     }
 
-    // Step 5: Try to require nodemailer
-    console.log("Step 5: Requiring nodemailer")
-    let nodemailer
-    try {
-      nodemailer = require("nodemailer")
-      console.log("Nodemailer loaded successfully")
-    } catch (err: any) {
-      console.error("Nodemailer require failed:", err)
-      return res.status(500).json({
-        error: "Failed to load nodemailer",
-        message: err.message,
-      })
-    }
+    console.log("Step 4: Required fields present")
 
-    // Step 6: Create transporter
-    console.log("Step 6: Creating transporter")
-    let transporter
-    try {
-      transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      })
-      console.log("Transporter created")
-    } catch (err: any) {
-      console.error("Transporter creation failed:", err)
-      return res.status(500).json({
-        error: "Failed to create transporter",
-        message: err.message,
-      })
-    }
+    // Import nodemailer
+    const nodemailer = require("nodemailer")
+    console.log("Step 5: Nodemailer imported")
 
-    // Step 7: Send email
-    console.log("Step 7: Sending email")
-    try {
-      const info = await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: process.env.ADMIN_EMAIL || "meghahshaha@gmail.com",
-        subject: "Test Email",
-        text: `Name: ${body.fullName || "Unknown"}\nEmail: ${body.email}\nPhone: ${body.phone}`,
-      })
+    // Create transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    })
 
-      console.log("Email sent:", info.messageId)
+    console.log("Step 6: Transporter created")
 
-      return res.status(200).json({
-        success: true,
-        messageId: info.messageId,
-      })
-    } catch (err: any) {
-      console.error("Email send failed:", err)
-      return res.status(500).json({
-        error: "Failed to send email",
-        message: err.message,
-        code: err.code,
-      })
-    }
+    // Send email
+    const info = await transporter.sendMail({
+      from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`,
+      to: process.env.ADMIN_EMAIL || "meghahshaha@gmail.com",
+      subject: "New Contact Form Submission",
+      html: `
+        <h3>🌿 Lifelong Wellness - New Contact Request</h3>
+        <p><strong>Name:</strong> ${body.fullName || "Unknown"}</p>
+        <p><strong>Email:</strong> ${body.email}</p>
+        <p><strong>Phone:</strong> ${body.phone}</p>
+        <p><strong>Message:</strong> ${body.message || "No message"}</p>
+        <p><strong>Type:</strong> ${body.type || "contact"}</p>
+        <p><strong>Time:</strong> ${new Date().toISOString()}</p>
+      `,
+    })
+
+    console.log("Step 7: Email sent successfully:", info.messageId)
+
+    return res.status(200).json({
+      success: true,
+      message: "Email sent successfully",
+      messageId: info.messageId,
+    })
   } catch (error: any) {
     console.error("Handler error:", error)
     return res.status(500).json({
-      error: "Handler failed",
+      error: "Internal server error",
       message: error.message,
-      stack: error.stack,
+      step: "Unknown",
     })
   }
 }

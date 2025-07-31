@@ -11,8 +11,18 @@ export interface EmailRequest {
   paymentScreenshot?: File
 }
 
-// Use your actual domain
-const API_BASE_URL = "https://www.lifelongwellness.co.in"
+// Detect the correct API base URL
+const getApiBaseUrl = () => {
+  // If we're in the browser, use the current origin
+  if (typeof window !== "undefined") {
+    return window.location.origin
+  }
+
+  // For server-side, use environment variable or fallback
+  return process.env.NEXT_PUBLIC_API_URL || "https://www.lifelongwellness.co.in"
+}
+
+const API_BASE_URL = getApiBaseUrl()
 
 console.log("API_BASE_URL:", API_BASE_URL)
 
@@ -20,6 +30,25 @@ export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: b
   try {
     console.log("Starting email send process...")
     console.log("Using API base URL:", API_BASE_URL)
+
+    // First, let's test if the API is reachable
+    try {
+      const testResponse = await fetch(`${API_BASE_URL}/api/test`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!testResponse.ok) {
+        throw new Error(`Test endpoint failed: ${testResponse.status}`)
+      }
+
+      console.log("Test endpoint successful")
+    } catch (testError: any) {
+      console.error("Test endpoint failed:", testError)
+      throw new Error(`API not accessible: ${testError.message}`)
+    }
 
     // Prepare request data
     const requestData = {
@@ -45,14 +74,12 @@ export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: b
         "Content-Type": "application/json",
       },
       body: JSON.stringify(requestData),
-      credentials: "include",
       signal: controller.signal,
     })
 
     clearTimeout(timeoutId)
 
     console.log("Email response status:", response.status)
-    console.log("Email response headers:", Object.fromEntries(response.headers.entries()))
 
     if (!response.ok) {
       let errorMessage = "Failed to send email"
