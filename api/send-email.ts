@@ -28,18 +28,7 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.some(allowed => 
-      typeof allowed === 'string' 
-        ? origin === allowed 
-        : allowed.test(origin))
-    ) {
-      callback(null, true);
-    } else {
-      console.warn(`CORS blocked: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -94,7 +83,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS
   },
   tls: {
-    rejectUnauthorized: false // For development only
+    rejectUnauthorized: false
   }
 });
 
@@ -338,12 +327,15 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Vercel serverless function handler
 export default async (req: VercelRequest, res: VercelResponse) => {
-  // Add Vercel-specific headers
+  // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('X-Powered-By', 'Vercel');
   
-  // Forward to Express app
+  // Handle OPTIONS request
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   return app(req, res);
 };

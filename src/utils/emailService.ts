@@ -11,13 +11,7 @@ export interface EmailRequest {
   paymentScreenshot?: File;
 }
 
-// Determine API base URL based on environment
-const getApiBaseUrl = () => {
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:3000/api';
-  }
-  return process.env.REACT_APP_API_BASE_URL || 'https://your-vercel-app.vercel.app/api';
-};
+const API_BASE_URL = 'https://www.lifelongwellness.co.in/api';
 
 export const sendEmailRequest = async (
   data: EmailRequest
@@ -39,11 +33,9 @@ export const sendEmailRequest = async (
       formData.append('paymentScreenshot', data.paymentScreenshot);
     }
 
-    const response = await fetch(`${getApiBaseUrl()}/send-email`, {
+    const response = await fetch(`${API_BASE_URL}/send-email`, {
       method: 'POST',
       body: formData,
-      // Don't set Content-Type header when using FormData
-      // The browser will set it automatically with the correct boundary
     });
 
     if (!response.ok) {
@@ -60,10 +52,9 @@ export const sendEmailRequest = async (
   }
 };
 
-// Utility function to check server connection
 export const checkServerConnection = async () => {
   try {
-    const response = await fetch(`${getApiBaseUrl()}/health`);
+    const response = await fetch(`${API_BASE_URL}/health`);
     if (!response.ok) {
       throw new Error('Server not responding');
     }
