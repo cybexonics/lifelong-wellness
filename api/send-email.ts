@@ -1,14 +1,39 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node"
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Set CORS headers first
-  res.setHeader("Access-Control-Allow-Origin", "*")
+  // Set CORS headers first - including the new Vercel preview URL
+  const origin = req.headers.origin
+  const allowedOrigins = [
+    "http://localhost:8080",
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8081",
+    "https://lifelong-wellness.vercel.app",
+    "https://lifelong-wellness-ftia-54wwept5g.vercel.app", // Add your current preview URL
+    "https://www.lifelongwellness.co.in",
+    "https://lifelongwellness.co.in",
+  ]
+
+  const isAllowedOrigin =
+    origin &&
+    (allowedOrigins.includes(origin) ||
+      /https:\/\/lifelong-wellness-.*\.vercel\.app/.test(origin) ||
+      /https:\/\/lifelong-wellness-git-.*\.vercel\.app/.test(origin))
+
+  if (isAllowedOrigin) {
+    res.setHeader("Access-Control-Allow-Origin", origin)
+  } else {
+    // For debugging, allow all origins temporarily
+    res.setHeader("Access-Control-Allow-Origin", "*")
+  }
+
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
   res.setHeader("Access-Control-Allow-Credentials", "true")
 
   // Handle preflight
   if (req.method === "OPTIONS") {
+    console.log("Handling OPTIONS request from:", origin)
     return res.status(200).end()
   }
 
@@ -21,10 +46,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Step 1: Basic response test
-    console.log("Handler called successfully")
+    console.log("Handler called from origin:", origin)
+    console.log("Request headers:", req.headers)
 
-    // Step 2: Check if we can access environment variables
+    // Check environment variables
     const hasEmailUser = !!process.env.EMAIL_USER
     const hasEmailPass = !!process.env.EMAIL_PASS
 
@@ -38,7 +63,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })
     }
 
-    // Step 3: Try to get request body
+    // Get request body
     let requestData: any = {}
     try {
       requestData = req.body || {}
@@ -52,7 +77,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })
     }
 
-    // Step 4: Extract basic fields
+    // Extract fields
     const email = requestData.email
     const phone = requestData.phone
     const fullName = requestData.fullName || "Test User"
@@ -65,7 +90,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })
     }
 
-    // Step 5: Try to import and use nodemailer
+    // Import and use nodemailer
     try {
       console.log("Attempting to import nodemailer...")
       const nodemailer = require("nodemailer")
@@ -91,6 +116,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           <p><strong>Name:</strong> ${fullName}</p>
           <p><strong>Email:</strong> ${email}</p>
           <p><strong>Phone:</strong> ${phone}</p>
+          <p><strong>Origin:</strong> ${origin}</p>
           <p><strong>Time:</strong> ${new Date().toISOString()}</p>
         `,
       })
@@ -109,7 +135,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         success: false,
         message: "Email sending failed",
         error: emailError.message,
-        stack: emailError.stack?.substring(0, 500), // Limit stack trace
+        stack: emailError.stack?.substring(0, 500),
       })
     }
   } catch (error: any) {
@@ -118,7 +144,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success: false,
       message: "Internal server error",
       error: error.message,
-      stack: error.stack?.substring(0, 500), // Limit stack trace
+      stack: error.stack?.substring(0, 500),
     })
   }
 }

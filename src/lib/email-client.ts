@@ -11,53 +11,22 @@ export interface EmailRequest {
   paymentScreenshot?: File
 }
 
+// Use the current Vercel deployment URL instead of the custom domain
 const API_BASE_URL =
-  process.env.NODE_ENV === "production" ? "https://www.lifelongwellness.co.in" : "http://localhost:3000"
+  typeof window !== "undefined"
+    ? window.location.origin // Use the current origin (works for all Vercel deployments)
+    : process.env.NODE_ENV === "production"
+      ? "https://lifelong-wellness-ftia-54wwept5g.vercel.app" // Your current deployment
+      : "http://localhost:3000"
 
-// Test simple endpoint first
-export const testSimpleEndpoint = async (): Promise<any> => {
-  try {
-    console.log("Testing simple endpoint...")
-
-    const response = await fetch(`${API_BASE_URL}/api/test-simple`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ test: true }),
-      credentials: "include",
-    })
-
-    console.log("Simple test response status:", response.status)
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`Simple test failed: ${response.status} - ${errorText}`)
-    }
-
-    const result = await response.json()
-    console.log("Simple test result:", result)
-    return result
-  } catch (error: any) {
-    console.error("Simple test failed:", error)
-    throw error
-  }
-}
+console.log("API_BASE_URL:", API_BASE_URL)
 
 export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: boolean; message: string }> => {
   try {
     console.log("Starting email send process...")
+    console.log("Using API base URL:", API_BASE_URL)
 
-    // Test simple endpoint first
-    try {
-      await testSimpleEndpoint()
-      console.log("Simple endpoint test passed")
-    } catch (testError: any) {
-      console.error("Simple endpoint test failed:", testError)
-      throw new Error(`Server connectivity issue: ${testError.message}`)
-    }
-
-    // For now, send as JSON instead of FormData to avoid parsing issues
+    // Prepare request data
     const requestData = {
       fullName: data.fullName || `${data.name || ""} ${data.surname || ""}`.trim(),
       email: data.email,
