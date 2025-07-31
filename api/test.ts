@@ -1,32 +1,33 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node"
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
-  console.log(`[${new Date().toISOString()}] Test API called`)
+  try {
+    // Set CORS headers
+    res.setHeader("Access-Control-Allow-Origin", "*")
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS")
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type")
 
-  res.setHeader("Access-Control-Allow-Origin", "*")
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type")
+    if (req.method === "OPTIONS") {
+      return res.status(200).end()
+    }
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end()
+    return res.status(200).json({
+      success: true,
+      message: "Test endpoint working!",
+      timestamp: new Date().toISOString(),
+      method: req.method,
+      environment: {
+        nodeVersion: process.version,
+        platform: process.platform,
+        hasEmailUser: !!process.env.EMAIL_USER,
+        hasEmailPass: !!process.env.EMAIL_PASS,
+      },
+    })
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      stack: error.stack,
+    })
   }
-
-  return res.status(200).json({
-    success: true,
-    message: "API is working!",
-    timestamp: new Date().toISOString(),
-    method: req.method,
-    url: req.url,
-    headers: {
-      origin: req.headers.origin,
-      referer: req.headers.referer,
-      "user-agent": req.headers["user-agent"],
-    },
-    environment: {
-      EMAIL_USER: !!process.env.EMAIL_USER,
-      EMAIL_PASS: !!process.env.EMAIL_PASS,
-      ADMIN_EMAIL: !!process.env.ADMIN_EMAIL,
-      NODE_ENV: process.env.NODE_ENV,
-    },
-  })
 }
