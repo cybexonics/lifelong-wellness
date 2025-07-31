@@ -14,31 +14,32 @@ export interface EmailRequest {
 const API_BASE_URL =
   process.env.NODE_ENV === "production" ? "https://www.lifelongwellness.co.in" : "http://localhost:3000"
 
-// Debug function to check server status
-export const debugServer = async (): Promise<any> => {
+// Test simple endpoint first
+export const testSimpleEndpoint = async (): Promise<any> => {
   try {
-    console.log("Running server debug check...")
+    console.log("Testing simple endpoint...")
 
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000)
-
-    const response = await fetch(`${API_BASE_URL}/api/debug`, {
-      method: "GET",
+    const response = await fetch(`${API_BASE_URL}/api/test-simple`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ test: true }),
       credentials: "include",
-      signal: controller.signal,
     })
 
-    clearTimeout(timeoutId)
+    console.log("Simple test response status:", response.status)
 
     if (!response.ok) {
-      throw new Error(`Debug check failed: ${response.status}`)
+      const errorText = await response.text()
+      throw new Error(`Simple test failed: ${response.status} - ${errorText}`)
     }
 
     const result = await response.json()
-    console.log("Debug check result:", result)
+    console.log("Simple test result:", result)
     return result
   } catch (error: any) {
-    console.error("Debug check failed:", error)
+    console.error("Simple test failed:", error)
     throw error
   }
 }
@@ -47,69 +48,47 @@ export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: b
   try {
     console.log("Starting email send process...")
 
-    // Run debug check first
+    // Test simple endpoint first
     try {
-      const debugResult = await debugServer()
-      console.log("Server debug passed:", debugResult)
-
-      if (!debugResult.environment.EMAIL_USER || !debugResult.environment.EMAIL_PASS) {
-        throw new Error("Server email configuration is missing")
-      }
-
-      if (!debugResult.modules.nodemailer) {
-        throw new Error("Server nodemailer module not available")
-      }
-
-      if (!debugResult.modules.formidable) {
-        throw new Error("Server formidable module not available")
-      }
-
-      if (debugResult.transporterTest && debugResult.transporterTest.includes("FAILED")) {
-        throw new Error(`Email service test failed: ${debugResult.transporterTest}`)
-      }
-    } catch (debugError: any) {
-      console.error("Pre-flight debug check failed:", debugError)
-      throw new Error(`Server configuration error: ${debugError.message}`)
+      await testSimpleEndpoint()
+      console.log("Simple endpoint test passed")
+    } catch (testError: any) {
+      console.error("Simple endpoint test failed:", testError)
+      throw new Error(`Server connectivity issue: ${testError.message}`)
     }
 
-    const formData = new FormData()
-
-    // Append all fields to FormData
-    if (data.name) formData.append("name", data.name)
-    if (data.surname) formData.append("surname", data.surname)
-    if (data.fullName) formData.append("fullName", data.fullName)
-    formData.append("email", data.email)
-    formData.append("phone", data.phone)
-    if (data.message) formData.append("message", data.message)
-    if (data.concern) formData.append("concern", data.concern)
-    if (data.consultationType) formData.append("consultationType", data.consultationType)
-    formData.append("type", data.type)
-
-    if (data.paymentScreenshot) {
-      if (data.paymentScreenshot.size > 5 * 1024 * 1024) {
-        throw new Error("File size too large. Please use a file smaller than 5MB.")
-      }
-      formData.append("paymentScreenshot", data.paymentScreenshot)
+    // For now, send as JSON instead of FormData to avoid parsing issues
+    const requestData = {
+      fullName: data.fullName || `${data.name || ""} ${data.surname || ""}`.trim(),
+      email: data.email,
+      phone: data.phone,
+      message: data.message || data.concern || "",
+      consultationType: data.consultationType || "",
+      type: data.type,
     }
 
-    console.log("Sending email request...")
+    console.log("Sending email request with data:", { ...requestData, email: "***", phone: "***" })
 
     const controller = new AbortController()
     const timeoutId = setTimeout(() => {
       console.log("Request timeout, aborting...")
       controller.abort()
-    }, 60000) // 60 second timeout
+    }, 30000) // 30 second timeout
 
     const response = await fetch(`${API_BASE_URL}/api/send-email`, {
       method: "POST",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestData),
       credentials: "include",
       signal: controller.signal,
     })
 
     clearTimeout(timeoutId)
 
-    console.log("Response received:", response.status, response.statusText)
+    console.log("Email response status:", response.status)
+    console.log("Email response headers:", Object.fromEntries(response.headers.entries()))
 
     if (!response.ok) {
       let errorMessage = "Failed to send email"
@@ -118,7 +97,8 @@ export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: b
         errorMessage = errorData.message || errorMessage
         console.error("Server error response:", errorData)
       } catch {
-        errorMessage = `Server error: ${response.status} ${response.statusText}`
+        const errorText = await response.text()
+        errorMessage = `Server error: ${response.status} - ${errorText}`
       }
       throw new Error(errorMessage)
     }

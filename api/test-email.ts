@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node"
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log(`[${new Date().toISOString()}] Test endpoint called`)
+  console.log(`[${new Date().toISOString()}] Simple test endpoint called`)
 
-  // Handle CORS
+  // Set CORS headers
   const origin = req.headers.origin
   const allowedOrigins = [
     "http://localhost:8080",
@@ -32,37 +32,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end()
   }
 
-  // Simple test endpoint
-  if (req.method === "POST") {
-    try {
-      const body = req.body || {}
-      console.log("Test request body:", body)
-
-      return res.status(200).json({
-        success: true,
-        message: "Test endpoint working",
-        receivedData: body,
-        timestamp: new Date().toISOString(),
-        headers: {
-          "content-type": req.headers["content-type"],
-          "user-agent": req.headers["user-agent"],
-          origin: req.headers.origin,
-        },
-      })
-    } catch (error: any) {
-      console.error("Test endpoint error:", error)
-      return res.status(500).json({
-        success: false,
-        message: "Test endpoint failed",
-        error: error.message,
-        timestamp: new Date().toISOString(),
-      })
-    }
+  try {
+    // Just return basic info
+    return res.status(200).json({
+      success: true,
+      message: "Simple test endpoint working",
+      timestamp: new Date().toISOString(),
+      method: req.method,
+      headers: {
+        "content-type": req.headers["content-type"],
+        "user-agent": req.headers["user-agent"],
+        origin: req.headers.origin,
+      },
+      body: req.body,
+      environment: {
+        EMAIL_USER: !!process.env.EMAIL_USER,
+        EMAIL_PASS: !!process.env.EMAIL_PASS,
+        ADMIN_EMAIL: !!process.env.ADMIN_EMAIL,
+        NODE_ENV: process.env.NODE_ENV,
+      },
+    })
+  } catch (error: any) {
+    console.error("Simple test error:", error)
+    return res.status(500).json({
+      success: false,
+      message: "Simple test failed",
+      error: error.message,
+    })
   }
-
-  return res.status(405).json({
-    success: false,
-    message: "Method not allowed",
-    timestamp: new Date().toISOString(),
-  })
 }
