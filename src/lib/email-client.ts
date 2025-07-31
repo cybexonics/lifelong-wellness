@@ -11,53 +11,66 @@ export interface EmailRequest {
   paymentScreenshot?: File
 }
 
-// Use the correct domain for production
 const API_BASE_URL =
   process.env.NODE_ENV === "production" ? "https://www.lifelongwellness.co.in" : "http://localhost:3000"
 
-// Test the connection first
-export const testConnection = async (): Promise<{ success: boolean; message: string }> => {
+// Debug function to check server status
+export const debugServer = async (): Promise<any> => {
   try {
-    console.log("Testing connection to:", `${API_BASE_URL}/api/test-email`)
+    console.log("Running server debug check...")
 
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 15000)
 
-    const response = await fetch(`${API_BASE_URL}/api/test-email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ test: true }),
+    const response = await fetch(`${API_BASE_URL}/api/debug`, {
+      method: "GET",
       credentials: "include",
       signal: controller.signal,
     })
 
     clearTimeout(timeoutId)
 
-    console.log("Test response status:", response.status)
-
     if (!response.ok) {
-      throw new Error(`Test failed with status: ${response.status}`)
+      throw new Error(`Debug check failed: ${response.status}`)
     }
 
     const result = await response.json()
-    console.log("Test connection successful:", result)
+    console.log("Debug check result:", result)
     return result
   } catch (error: any) {
-    console.error("Connection test failed:", error)
-    if (error.name === "AbortError") {
-      throw new Error("Connection test timed out")
-    }
-    throw new Error(error.message || "Connection test failed")
+    console.error("Debug check failed:", error)
+    throw error
   }
 }
 
 export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: boolean; message: string }> => {
   try {
-    // Test connection first
-    console.log("Testing connection before sending email...")
-    await testConnection()
+    console.log("Starting email send process...")
+
+    // Run debug check first
+    try {
+      const debugResult = await debugServer()
+      console.log("Server debug passed:", debugResult)
+
+      if (!debugResult.environment.EMAIL_USER || !debugResult.environment.EMAIL_PASS) {
+        throw new Error("Server email configuration is missing")
+      }
+
+      if (!debugResult.modules.nodemailer) {
+        throw new Error("Server nodemailer module not available")
+      }
+
+      if (!debugResult.modules.formidable) {
+        throw new Error("Server formidable module not available")
+      }
+
+      if (debugResult.transporterTest && debugResult.transporterTest.includes("FAILED")) {
+        throw new Error(`Email service test failed: ${debugResult.transporterTest}`)
+      }
+    } catch (debugError: any) {
+      console.error("Pre-flight debug check failed:", debugError)
+      throw new Error(`Server configuration error: ${debugError.message}`)
+    }
 
     const formData = new FormData()
 
@@ -73,21 +86,19 @@ export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: b
     formData.append("type", data.type)
 
     if (data.paymentScreenshot) {
-      // Check file size before sending
       if (data.paymentScreenshot.size > 5 * 1024 * 1024) {
         throw new Error("File size too large. Please use a file smaller than 5MB.")
       }
       formData.append("paymentScreenshot", data.paymentScreenshot)
     }
 
-    console.log("Sending email request to:", `${API_BASE_URL}/api/send-email`)
+    console.log("Sending email request...")
 
-    // Create abort controller for timeout
     const controller = new AbortController()
     const timeoutId = setTimeout(() => {
       console.log("Request timeout, aborting...")
       controller.abort()
-    }, 45000) // 45 second timeout
+    }, 60000) // 60 second timeout
 
     const response = await fetch(`${API_BASE_URL}/api/send-email`, {
       method: "POST",
@@ -98,8 +109,7 @@ export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: b
 
     clearTimeout(timeoutId)
 
-    console.log("Response status:", response.status)
-    console.log("Response headers:", Object.fromEntries(response.headers.entries()))
+    console.log("Response received:", response.status, response.statusText)
 
     if (!response.ok) {
       let errorMessage = "Failed to send email"
@@ -120,11 +130,7 @@ export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: b
     console.error("Email sending error:", error)
 
     if (error.name === "AbortError") {
-      throw new Error("Request timed out. Please try again with a smaller file or check your internet connection.")
-    }
-
-    if (error.message.includes("net::ERR_CONNECTION_RESET")) {
-      throw new Error("Connection was reset. Please check your internet connection and try again.")
+      throw new Error("Request timed out. Please try again.")
     }
 
     throw new Error(error.message || "Failed to send request. Please try again or contact us directly.")
