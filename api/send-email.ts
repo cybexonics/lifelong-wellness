@@ -14,7 +14,7 @@ const allowedOrigins = [
   "https://lifelongwellness.co.in",
 ]
 
-// Email transporter configuration - Fixed typo: createTransport not createTransporter
+// Email transporter configuration
 const createTransporter = () => {
   try {
     return nodemailer.createTransport({
@@ -29,6 +29,10 @@ const createTransporter = () => {
       tls: {
         rejectUnauthorized: false,
       },
+      // Add connection timeout settings
+      connectionTimeout: 60000, // 60 seconds
+      greetingTimeout: 30000, // 30 seconds
+      socketTimeout: 60000, // 60 seconds
     })
   } catch (error) {
     console.error("Failed to create email transporter:", error)
@@ -64,36 +68,11 @@ const createEmailTemplate = (data: {
           <h2>🌿 Lifelong Wellness</h2>
           <p>New ${isConsultation ? "Consultation" : "Contact"} Request</p>
         </div>
-        
-        <div class="field">
-          <strong>Name:</strong> ${data.fullName}
-        </div>
-        
-        <div class="field">
-          <strong>Email:</strong> ${data.email}
-        </div>
-        
-        <div class="field">
-          <strong>Phone:</strong> ${data.phone}
-        </div>
-        
-        ${
-          data.consultationType
-            ? `
-        <div class="field">
-          <strong>Consultation Type:</strong> ${data.consultationType}
-        </div>`
-            : ""
-        }
-        
-        ${
-          data.message
-            ? `
-        <div class="field">
-          <strong>Message:</strong> ${data.message.replace(/\n/g, "<br>")}
-        </div>`
-            : ""
-        }
+        <div class="field"><strong>Name:</strong> ${data.fullName}</div>
+        <div class="field"><strong>Email:</strong> ${data.email}</div>
+        <div class="field"><strong>Phone:</strong> ${data.phone}</div>
+        ${data.consultationType ? `<div class="field"><strong>Consultation Type:</strong> ${data.consultationType}</div>` : ""}
+        ${data.message ? `<div class="field"><strong>Message:</strong> ${data.message.replace(/\n/g, "<br>")}</div>` : ""}
       </div>
     </body>
     </html>
@@ -124,40 +103,40 @@ const createAutoReplyTemplate = (data: {
           <h2>🌿 Lifelong Wellness</h2>
           <p>Thank You for Contacting Us</p>
         </div>
-        
         <p>Dear ${firstName},</p>
-        
         <div class="highlight">
           <p>We've received your ${isConsultation ? "consultation request" : "message"} and will respond within 24 hours.</p>
           ${isConsultation ? "<p><strong>Your consultation is confirmed!</strong></p>" : ""}
         </div>
-        
         <p>For immediate assistance, please contact us at:</p>
         <p><strong>Phone/WhatsApp:</strong> +91 94210 69326</p>
         <p><strong>Email:</strong> meghahshaha@gmail.com</p>
-        
-        <p>Best regards,<br>
-        <strong>Dr. Megha Shaha</strong><br>
-        Lifelong Wellness</p>
+        <p>Best regards,<br><strong>Dr. Megha Shaha</strong><br>Lifelong Wellness</p>
       </div>
     </body>
     </html>
   `
 }
 
-// Parse form data with better error handling
+// Parse form data with smaller file size limit to prevent timeouts
 const parseForm = (req: VercelRequest): Promise<{ fields: any; files: any }> => {
   return new Promise((resolve, reject) => {
     try {
       const form = formidable({
-        maxFileSize: 10 * 1024 * 1024, // 10MB
+        maxFileSize: 5 * 1024 * 1024, // Reduced to 5MB to prevent timeouts
         allowEmptyFiles: false,
         filter: ({ mimetype }) => {
           return !!(mimetype && ["image/jpeg", "image/png", "image/gif", "application/pdf"].includes(mimetype))
         },
       })
 
+      // Set a timeout for form parsing
+      const timeout = setTimeout(() => {
+        reject(new Error("Form parsing timeout"))
+      }, 25000) // 25 seconds timeout
+
       form.parse(req, (err, fields, files) => {
+        clearTimeout(timeout)
         if (err) {
           console.error("Form parsing error:", err)
           reject(new Error(`Form parsing failed: ${err.message}`))
@@ -173,15 +152,21 @@ const parseForm = (req: VercelRequest): Promise<{ fields: any; files: any }> => 
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log("Email handler called with method:", req.method)
+  const startTime = Date.now()
+  console.log(`[${new Date().toISOString()}] Email handler called with method: ${req.method}`)
+
+  // Set response timeout headers
+  res.setHeader("Connection", "keep-alive")
+  res.setHeader("Keep-Alive", "timeout=30")
 
   try {
-    // Validate environment variables
+    // Validate environment variables first
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       console.error("Missing email credentials")
       return res.status(500).json({
         success: false,
         message: "Email service not configured",
+        timestamp: new Date().toISOString(),
       })
     }
 
@@ -210,17 +195,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(405).json({
         success: false,
         message: "Method not allowed",
+        timestamp: new Date().toISOString(),
       })
     }
 
     console.log("Parsing form data...")
+    const parseStartTime = Date.now()
 
-    // Parse form data
+    // Parse form data with timeout
     const { fields, files } = await parseForm(req)
 
-    console.log("Form parsed successfully, fields:", Object.keys(fields))
+    console.log(`Form parsed in ${Date.now() - parseStartTime}ms, fields:`, Object.keys(fields))
 
-    // Extract fields (formidable returns arrays for fields)
+    // Extract fields
     const getField = (field: any) => (Array.isArray(field) ? field[0] : field)
 
     const email = getField(fields.email)
@@ -232,6 +219,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({
         success: false,
         message: "Email and phone are required fields",
+        timestamp: new Date().toISOString(),
       })
     }
 
@@ -264,30 +252,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log("Creating email transporter...")
     const transporter = createTransporter()
 
-    // Verify transporter configuration
+    // Quick verification with timeout
+    console.log("Verifying email transporter...")
+    const verifyStartTime = Date.now()
+
     try {
-      await transporter.verify()
-      console.log("Email transporter verified successfully")
-    } catch (verifyError) {
-      console.error("Email transporter verification failed:", verifyError)
+      await Promise.race([
+        transporter.verify(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Verification timeout")), 10000)),
+      ])
+      console.log(`Email transporter verified in ${Date.now() - verifyStartTime}ms`)
+    } catch (verifyError: any) {
+      console.error("Email transporter verification failed:", verifyError.message)
       return res.status(500).json({
         success: false,
         message: "Email service configuration error",
+        error: verifyError.message,
+        timestamp: new Date().toISOString(),
       })
     }
 
-    // Send email with retry logic
-    const sendWithRetry = async (mailOptions: any, retries = 2): Promise<any> => {
+    // Send email with timeout and retry logic
+    const sendWithRetry = async (mailOptions: any, retries = 1): Promise<any> => {
       try {
-        console.log("Attempting to send email, retries left:", retries)
-        const result = await transporter.sendMail(mailOptions)
-        console.log("Email sent successfully:", result.messageId)
+        console.log(`Attempting to send email, retries left: ${retries}`)
+        const sendStartTime = Date.now()
+
+        const result = await Promise.race([
+          transporter.sendMail(mailOptions),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("Email send timeout")), 15000)),
+        ])
+
+        console.log(`Email sent successfully in ${Date.now() - sendStartTime}ms:`, (result as any).messageId)
         return result
       } catch (error: any) {
         console.error("Email send error:", error.message)
         if (retries > 0) {
           console.log("Retrying email send...")
-          await new Promise((resolve) => setTimeout(resolve, 2000))
+          await new Promise((resolve) => setTimeout(resolve, 1000))
           return sendWithRetry(mailOptions, retries - 1)
         }
         throw error
@@ -323,17 +325,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    console.log("Email process completed successfully")
+    const totalTime = Date.now() - startTime
+    console.log(`Email process completed successfully in ${totalTime}ms`)
+
     return res.status(200).json({
       success: true,
       message: "Email sent successfully",
+      processingTime: totalTime,
+      timestamp: new Date().toISOString(),
     })
   } catch (error: any) {
-    console.error("Handler error:", error)
+    const totalTime = Date.now() - startTime
+    console.error(`Handler error after ${totalTime}ms:`, error)
+
     return res.status(500).json({
       success: false,
       message: "Failed to send email",
       error: process.env.NODE_ENV === "development" ? error.message : "Internal server error",
+      processingTime: totalTime,
+      timestamp: new Date().toISOString(),
     })
   }
 }
