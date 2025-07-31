@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 
+
 const Index = () => {
   const { toast } = useToast()
   const [isFlipped, setIsFlipped] = useState(false)
@@ -248,7 +249,7 @@ const Index = () => {
                             <div className="flex justify-center mb-3">
                               <div className="relative">
                                 <img
-                                  src="/images/qr-code-payment.png"
+                                  src="/assets/qr-code.jpg"
                                   alt="Payment QR Code"
                                   className="w-28 h-28 border-2 border-primary/30 rounded-lg shadow-md"
                                 />
