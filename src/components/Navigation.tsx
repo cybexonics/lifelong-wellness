@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 
+
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isCallDialogOpen, setIsCallDialogOpen] = useState(false)
@@ -34,6 +35,7 @@ const Navigation = () => {
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
     { name: "Methods", href: "/methods" },
+    { name: "Services", href: "/services" },
     { name: "Contact", href: "/contact" },
   ]
 
@@ -52,6 +54,7 @@ const Navigation = () => {
     setIsLoading(true)
 
     try {
+      // Use FormData for compatibility with multer backend
       const result = await sendEmailRequest({
         ...formData,
         type: "callback",

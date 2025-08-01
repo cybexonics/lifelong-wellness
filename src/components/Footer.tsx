@@ -2,7 +2,7 @@ import { Heart, Mail, MessageCircle, Instagram, Youtube, Phone, Facebook } from 
 import { Button } from "@/components/ui/button"
 import LogoImage from "@/assets/logo.png"
 import { FaGoogle } from "react-icons/fa";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useNavigate, Link } from "react-router-dom"; // Import useNavigate for navigation
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -51,11 +51,20 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <div className="space-y-2">
-              {["About Dr. Megha", "Healing Method", "Success Stories", "Free Resources", "Programs"].map((link) => (
-                <div key={link}>
-                  <a href="#" className="text-muted-foreground hover:text-primary transition-colors duration-200">
-                    {link}
-                  </a>
+              {[
+                { label: "About Dr. Megha", to: "/about" },
+                { label: "Healing Method", to: "/method" },
+                { label: "Success Stories", to: "/about" },
+                { label: "Free Resources", to: "/about" },
+                { label: "Programs", to: "/about" },
+              ].map((link) => (
+                <div key={link.label}>
+                  <Link
+                    to={link.to}
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                  >
+                    {link.label}
+                  </Link>
                 </div>
               ))}
             </div>
@@ -65,11 +74,20 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Services</h4>
             <div className="space-y-2">
-              {["PCOS Reversal", "Fertility Enhancement", "Weight Management", "Hormonal Balance", "Detox Programs"].map((service) => (
-                <div key={service}>
-                  <a href="#" className="text-muted-foreground hover:text-primary transition-colors duration-200">
-                    {service}
-                  </a>
+              {[
+                { label: "PCOS Reversal", to: "/services" },
+                { label: "Fertility Enhancement", to: "/services" },
+                { label: "Weight Management", to: "/servicest" },
+                { label: "Hormonal Balance", to: "/services" },
+                { label: "Detox Programs", to: "/services" },
+              ].map((service) => (
+                <div key={service.label}>
+                  <Link
+                    to={service.to}
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                  >
+                    {service.label}
+                  </Link>
                 </div>
               ))}
             </div>

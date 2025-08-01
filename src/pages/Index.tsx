@@ -42,7 +42,7 @@ const Index = () => {
       submitData.append("phone", formData.phone)
       submitData.append("message", formData.message)
       submitData.append("type", "consultation")
-      submitData.append("consultationType", "First Consultation Discount")
+      submitData.append("consultationType", "First Consultation Discount")  
 
       if (paymentScreenshot) {
         submitData.append("paymentScreenshot", paymentScreenshot)
@@ -50,7 +50,7 @@ const Index = () => {
 
       console.log("Submitting consultation request...")
 
-      const response = await fetch("http://localhost:3001/api/send-email", {
+      const response = await fetch("https://www.lifelongwellness.co.in/api/send-email", {
         method: "POST",
         body: submitData,
       })

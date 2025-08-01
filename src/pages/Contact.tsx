@@ -43,7 +43,7 @@ const Contact = () => {
 
       console.log("Submitting contact form:", submitData)
 
-      const response = await fetch("http://localhost:3001/api/send-email", {
+      const response = await fetch("https://www.lifelongwellness.co.in/api/send-email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -198,8 +198,8 @@ const Contact = () => {
                           </div>
                           <div>
                             <h3 className="font-semibold mb-1">Working Hours</h3>
-                            <p className="text-muted-foreground">Monday - Saturday: 9:00 AM - 7:00 PM</p>
-                            <p className="text-muted-foreground">Sunday: 10:00 AM - 4:00 PM</p>
+                            <p className="text-muted-foreground">Monday - Saturday: 9:00 AM - 5:00 PM</p>
+                          
                           </div>
                         </div>
                       </CardContent>

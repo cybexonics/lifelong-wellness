@@ -11,9 +11,7 @@ export interface EmailRequest {
   paymentScreenshot?: File
 }
 
-// Use the correct domain for production
-const API_BASE_URL =
-  process.env.NODE_ENV === "production" ? "https://www.lifelongwellness.co.in" : "http://localhost:3000"
+const API_BASE_URL = "https://www.lifelongwellness.co.in/api"
 
 export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: boolean; message: string }> => {
   try {
@@ -34,22 +32,15 @@ export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: b
       formData.append("paymentScreenshot", data.paymentScreenshot)
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/send-email`, {
+    const response = await fetch(`${API_BASE_URL}/send-email`, {
       method: "POST",
       body: formData,
       credentials: "include",
     })
 
     if (!response.ok) {
-      let errorMessage = "Failed to send email"
-      try {
-        const errorData = await response.json()
-        errorMessage = errorData.message || errorMessage
-      } catch {
-        // If response is not JSON, use default message
-        errorMessage = `Server error: ${response.status}`
-      }
-      throw new Error(errorMessage)
+      const errorData = await response.json()
+      throw new Error(errorData.message || "Failed to send email")
     }
 
     return await response.json()
@@ -61,13 +52,12 @@ export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: b
 
 export const checkServerConnection = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/health`)
-    if (!response.ok) {
-      throw new Error("Server not responding")
-    }
-    return await response.json()
+    const response = await fetch(`${API_BASE_URL}/send-email`, {
+      method: "OPTIONS",
+    })
+    return response.ok
   } catch (error) {
     console.error("Server connection check failed:", error)
-    throw error
+    return false
   }
 }
