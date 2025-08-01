@@ -10,7 +10,7 @@ const Footer = () => {
   // Social media links
   const socialLinks = {
     facebook: "https://www.facebook.com/share/18WfXH6g4m/",
-    instagram: "https://www.instagram.com/megha_shaha83?igsh=d3ZicGhjZXE0czZ4",
+    instagram: "https://www.instagram.com/fitnness_coach_megha_shaha?igsh=ZWR2ajd2enlvMmoz",
     youtube: "https://youtube.com/@meghashaha1156?si=fePkXyIeNJDhiesm",
     googleBusiness: "https://g.co/kgs/ezHLMBB"
   };
