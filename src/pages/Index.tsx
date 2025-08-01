@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import Navigation from "@/components/Navigation"
 import HeroSection from "@/components/HeroSection"
 import TestimonialsSection from "@/components/TestimonialsSection"
@@ -16,7 +15,6 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-
 
 const Index = () => {
   const { toast } = useToast()
@@ -42,14 +40,13 @@ const Index = () => {
       submitData.append("phone", formData.phone)
       submitData.append("message", formData.message)
       submitData.append("type", "consultation")
-      submitData.append("consultationType", "First Consultation Discount")  
+      submitData.append("consultationType", "First Consultation Discount")
 
       if (paymentScreenshot) {
         submitData.append("paymentScreenshot", paymentScreenshot)
       }
 
       console.log("Submitting consultation request...")
-
       const response = await fetch("https://www.lifelongwellness.co.in/api/send-email", {
         method: "POST",
         body: submitData,
@@ -130,7 +127,6 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-
       <main>
         <section id="home" className="mt-6">
           <HeroSection />
@@ -245,24 +241,22 @@ const Index = () => {
                               <CreditCard className="w-5 h-5 text-primary" />
                               <h4 className="font-semibold text-sm text-primary">Pay ₹499 for First Consultation</h4>
                             </div>
-
                             <div className="flex justify-center mb-3">
                               <div className="relative">
                                 <img
                                   src="/assets/qr-code.jpg"
-                                  alt="Payment QR Code"
-                                  className="w-28 h-28 border-2 border-primary/30 rounded-lg shadow-md"
+                                  alt="Payment QR Code - Scan to pay ₹499"
+                                  className="w-32 h-40 border-2 border-primary/30 rounded-lg shadow-md object-contain bg-white"
                                 />
                                 <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-bold">
                                   ₹499
                                 </div>
                               </div>
                             </div>
-
                             <div className="space-y-1">
                               <p className="text-xs text-muted-foreground">Scan QR code to pay via UPI</p>
-                              <p className="text-xs font-medium text-primary">UPI ID: drmeghashaha@paytm</p>
-                              <p className="text-xs text-orange-600 font-medium">⚡ Instant Payment • Secure</p>
+                              <p className="text-xs font-medium text-primary">UPI ID: 9421069326@sbi</p>
+                              <p className="text-xs text-orange-600 font-medium">⚡ Instant Payment • Secure • SBI</p>
                             </div>
                           </div>
 
@@ -535,7 +529,6 @@ const Index = () => {
         {/* Booking Form */}
         <BookingForm />
       </main>
-
       <Footer />
     </div>
   )

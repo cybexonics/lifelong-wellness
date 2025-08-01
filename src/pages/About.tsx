@@ -38,7 +38,7 @@ const About = () => {
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
-                  <Badge className="mb-4">About DT. Megha</Badge>
+                  <Badge className="mb-4">About DR. Megha</Badge>
                   <h1 className="font-serif text-4xl md:text-5xl font-bold mb-6">
                     Dedicated to <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">Holistic Healing</span>
                   </h1>

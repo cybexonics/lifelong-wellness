@@ -1,8 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node"
 import * as nodemailer from "nodemailer"
+import type { Attachment } from "nodemailer/lib/mailer"
 
 // Email transporter configuration
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   service: "gmail",
   host: "smtp.gmail.com",
   port: 587,
@@ -252,7 +253,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Prepare attachments
-    const attachments: nodemailer.Attachment[] = []
+    const attachments: Attachment[] = []
 
     if (files.paymentScreenshot) {
       attachments.push({
