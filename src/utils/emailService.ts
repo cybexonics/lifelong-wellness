@@ -39,8 +39,8 @@ export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: b
     })
 
     if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || "Failed to send email")
+      const errorData = await response.json().catch(() => ({ message: "Network error" }))
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
     }
 
     return await response.json()
@@ -50,7 +50,7 @@ export const sendEmailRequest = async (data: EmailRequest): Promise<{ success: b
   }
 }
 
-export const checkServerConnection = async () => {
+export const checkServerConnection = async (): Promise<boolean> => {
   try {
     const response = await fetch(`${API_BASE_URL}/send-email`, {
       method: "OPTIONS",

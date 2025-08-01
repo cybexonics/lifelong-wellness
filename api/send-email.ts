@@ -1,23 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node"
 import nodemailer from "nodemailer"
-import multer from "multer"
-
-// Configure multer for file uploads
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-  fileFilter: (req, file, cb) => {
-    const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif", "application/pdf"]
-    if (allowedMimeTypes.includes(file.mimetype)) {
-      cb(null, true)
-    } else {
-      cb(new Error("Only images (JPEG, PNG, GIF) and PDFs are allowed"))
-    }
-  },
-})
 
 // Email transporter configuration
-const transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransporter({
   service: "gmail",
   host: "smtp.gmail.com",
   port: 587,
@@ -41,7 +26,6 @@ const createEmailTemplate = (data: {
   type: "consultation" | "contact" | "callback"
 }): string => {
   const isConsultation = data.type === "consultation"
-
   return `
     <!DOCTYPE html>
     <html>
@@ -102,7 +86,6 @@ const createAutoReplyTemplate = (data: {
 }): string => {
   const isConsultation = data.type === "consultation"
   const firstName = data.fullName.split(" ")[0] || data.fullName
-
   return `
     <!DOCTYPE html>
     <html>
@@ -142,27 +125,65 @@ const createAutoReplyTemplate = (data: {
   `
 }
 
-// Helper function to handle multipart form data
-const parseMultipartForm = (req: VercelRequest): Promise<{ fields: any; files: any }> => {
+// Simple multipart parser for Vercel Functions
+const parseMultipartData = async (
+  req: VercelRequest,
+): Promise<{ fields: Record<string, string>; files: Record<string, Buffer> }> => {
   return new Promise((resolve, reject) => {
-    const uploadSingle = upload.single("paymentScreenshot")
-    uploadSingle(req as any, {} as any, (err: any) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve({
-          fields: req.body,
-          files: (req as any).file ? { paymentScreenshot: (req as any).file } : {},
-        })
+    const chunks: Buffer[] = []
+
+    req.on("data", (chunk) => {
+      chunks.push(chunk)
+    })
+
+    req.on("end", () => {
+      try {
+        const buffer = Buffer.concat(chunks)
+        const boundary = req.headers["content-type"]?.split("boundary=")[1]
+
+        if (!boundary) {
+          resolve({ fields: {}, files: {} })
+          return
+        }
+
+        const parts = buffer.toString().split(`--${boundary}`)
+        const fields: Record<string, string> = {}
+        const files: Record<string, Buffer> = {}
+
+        for (const part of parts) {
+          if (part.includes("Content-Disposition: form-data")) {
+            const nameMatch = part.match(/name="([^"]+)"/)
+            if (!nameMatch) continue
+
+            const fieldName = nameMatch[1]
+
+            if (part.includes("Content-Type:")) {
+              // This is a file
+              const contentStart = part.indexOf("\r\n\r\n") + 4
+              const contentEnd = part.lastIndexOf("\r\n")
+              if (contentStart < contentEnd) {
+                const fileContent = Buffer.from(part.slice(contentStart, contentEnd), "binary")
+                files[fieldName] = fileContent
+              }
+            } else {
+              // This is a regular field
+              const valueStart = part.indexOf("\r\n\r\n") + 4
+              const valueEnd = part.lastIndexOf("\r\n")
+              if (valueStart < valueEnd) {
+                fields[fieldName] = part.slice(valueStart, valueEnd).trim()
+              }
+            }
+          }
+        }
+
+        resolve({ fields, files })
+      } catch (error) {
+        reject(error)
       }
     })
-  })
-}
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
+    req.on("error", reject)
+  })
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -179,7 +200,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (origin && allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin)
   }
-
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
   res.setHeader("Access-Control-Allow-Credentials", "true")
@@ -195,8 +215,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Parse multipart form data
-    const { fields, files } = await parseMultipartForm(req)
+    let fields: Record<string, string> = {}
+    let files: Record<string, Buffer> = {}
+
+    // Check if it's multipart form data
+    const contentType = req.headers["content-type"] || ""
+
+    if (contentType.includes("multipart/form-data")) {
+      const parsed = await parseMultipartData(req)
+      fields = parsed.fields
+      files = parsed.files
+    } else if (contentType.includes("application/json")) {
+      // Handle JSON data
+      fields = req.body || {}
+    } else {
+      // Handle URL encoded data
+      fields = req.body || {}
+    }
 
     // Validate required fields
     if (!fields.email || !fields.phone) {
@@ -213,23 +248,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       phone: fields.phone,
       message: fields.message || fields.concern || "",
       consultationType: fields.consultationType || "",
-      type: fields.type || "contact",
+      type: (fields.type as "consultation" | "contact" | "callback") || "contact",
     }
 
     // Prepare attachments
-    const attachments: NonNullable<nodemailer.SendMailOptions["attachments"]> = []
+    const attachments: nodemailer.Attachment[] = []
+
     if (files.paymentScreenshot) {
       attachments.push({
-        filename: files.paymentScreenshot.originalname,
-        content: files.paymentScreenshot.buffer,
+        filename: "payment-screenshot.jpg",
+        content: files.paymentScreenshot,
       })
     }
 
     // Send email with retry logic
-    const sendWithRetry = async (mailOptions: any, retries = 3) => {
+    const sendWithRetry = async (mailOptions: nodemailer.SendMailOptions, retries = 3): Promise<any> => {
       try {
         return await transporter.sendMail(mailOptions)
       } catch (error) {
+        console.error(`Email send attempt failed (${4 - retries}/3):`, error)
         if (retries > 0) {
           await new Promise((resolve) => setTimeout(resolve, 2000))
           return sendWithRetry(mailOptions, retries - 1)
@@ -260,11 +297,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       message: "Email sent successfully",
     })
   } catch (error: any) {
-    console.error("Email error:", error)
+    console.error("Email function error:", error)
     res.status(500).json({
       success: false,
       message: "Failed to send email",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      error: process.env.NODE_ENV === "development" ? error.message : "Internal server error",
     })
   }
 }
