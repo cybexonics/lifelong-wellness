@@ -42,7 +42,14 @@ const BookingForm = () => {
         credentials: "include",
       })
 
-      const data = await response.json()
+      let data
+      const contentType = response.headers.get("content-type")
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        throw new Error(text)
+      }
 
       if (response.ok && data.success) {
         toast({

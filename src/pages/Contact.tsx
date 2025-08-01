@@ -32,26 +32,28 @@ const Contact = () => {
 
     try {
       const fullName = `${formData.name} ${formData.surname}`.trim()
-      const submitData = {
-        fullName,
-        email: formData.email,
-        phone: formData.phone,
-        consultationType: formData.consultationType,
-        message: formData.message,
-        type: "contact",
-      }
-
-      console.log("Submitting contact form:", submitData)
+      const submitData = new FormData()
+      submitData.append("fullName", fullName)
+      submitData.append("email", formData.email)
+      submitData.append("phone", formData.phone)
+      submitData.append("consultationType", formData.consultationType)
+      submitData.append("message", formData.message)
+      submitData.append("type", "contact")
 
       const response = await fetch("https://www.lifelongwellness.co.in/api/send-email", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(submitData),
+        body: submitData,
+        credentials: "include",
       })
 
-      const data = await response.json()
+      let data
+      const contentType = response.headers.get("content-type")
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        throw new Error(text)
+      }
 
       if (response.ok && data.success) {
         toast({
