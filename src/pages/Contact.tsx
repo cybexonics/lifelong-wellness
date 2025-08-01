@@ -215,7 +215,7 @@ const Contact = () => {
                     <CardHeader className="p-0 mb-6">
                       <CardTitle className="font-serif text-2xl flex items-center gap-2">
                         <Calendar className="w-6 h-6 text-primary" />
-                        Book Your Free Consultation
+                        Book Your Consultation form Online now !
                       </CardTitle>
                       <p className="text-muted-foreground">
                         Fill out the form below and we'll contact you to schedule your personalized consultation.
@@ -291,10 +291,7 @@ const Contact = () => {
                             disabled={isSubmitting}
                             className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            <option value="">Select consultation type</option>
                             <option value="online">Online Consultation</option>
-                            <option value="offline">In-Person Consultation</option>
-                            <option value="either">Either (I'm flexible)</option>
                           </select>
                         </div>
 

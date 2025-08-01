@@ -142,16 +142,16 @@ const Index = () => {
                   <h2 className="font-serif text-3xl md:text-4xl font-bold mb-6">
                     Meet{" "}
                     <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
-                      Dr. Megha Shaha
+                      Dt. Megha Shaha
                     </span>
                   </h2>
                   <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                    A dedicated healer with over 10 years of experience in holistic medicine, helping women achieve
+                    A dedicated healer with over 15+ years of experience in holistic medicine, helping women achieve
                     optimal health through natural, evidence-based treatments.
                   </p>
                   <Link to="/about">
                     <Button variant="nature" size="lg">
-                      Learn More About Dr. Megha
+                      Learn More About Dt.Megha
                       <ArrowRight className="w-5 h-5" />
                     </Button>
                   </Link>
@@ -172,7 +172,7 @@ const Index = () => {
                             <div className="text-center mb-4">
                               <div className="flex flex-col items-center mb-2">
                                 <div className="relative">
-                                  <span className="text-lg text-muted-foreground line-through mr-2">₹1000</span>
+                                  <span className="text-lg text-muted-foreground line-through mr-2">₹999</span>
                                   <div className="absolute -top-3 -right-3 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
                                     -50%
                                   </div>
@@ -492,9 +492,9 @@ const Index = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <Card className="p-8 hover:shadow-elegant transition-all duration-300 hover:-translate-y-1">
                   <CardContent className="p-0">
-                    <h3 className="font-serif text-2xl font-semibold mb-4">About Dr. Megha</h3>
+                    <h3 className="font-serif text-2xl font-semibold mb-4">About Dt.Megha</h3>
                     <p className="text-muted-foreground mb-6 leading-relaxed">
-                      Learn about Dr. Megha's journey, education, and passion for holistic healing. Discover why
+                      Learn about Dt.Megha's journey, education, and passion for holistic healing. Discover why
                       thousands of women trust her with their health.
                     </p>
                     <Link to="/about">

@@ -38,12 +38,12 @@ const About = () => {
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
-                  <Badge className="mb-4">About DR. Megha</Badge>
+                  <Badge className="mb-4">About Dt.Megha</Badge>
                   <h1 className="font-serif text-4xl md:text-5xl font-bold mb-6">
                     Dedicated to <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">Holistic Healing</span>
                   </h1>
                   <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                    Hello! I'm DT. Megha Shaha, founder of Lifelong Wellness.
+                    Hello! I'm Dt.Megha Shaha, founder of Lifelong Wellness.
                     I'm a disease reversal nutritionist, yoga trainer, and naturopathy expert. After losing my mother
                     to illness despite medical treatment, I made it my mission to help women heal naturally without medicine.
                     I work with women struggling with lifestyle diseases like PCOS, acidity, and infertility,
@@ -107,38 +107,8 @@ const About = () => {
           </div>
         </section>
 
-        {/* Education */}
-        <section className="py-20 bg-secondary/10">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-16">
-                <GraduationCap className="w-16 h-16 text-primary mx-auto mb-4" />
-                <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4">Education & Training</h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Continuous learning and expertise in both conventional and holistic medicine
-                </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {education.map((item, index) => (
-                  <Card key={index} className="p-6">
-                    <CardContent className="p-0">
-                      <div className="flex items-start gap-4">
-                        <div className="bg-primary/10 p-3 rounded-full">
-                          <GraduationCap className="w-6 h-6 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-lg mb-1">{item.degree}</h3>
-                          <p className="text-muted-foreground">{item.institution}</p>
-                          <p className="text-sm text-primary font-medium">{item.year}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+       
+      
 
         {/* Experience */}
         <section className="py-20">
@@ -207,7 +177,7 @@ const About = () => {
                     all aspects of their lives."
                   </p>
                   <div className="mt-8 text-right">
-                    <p className="font-serif text-xl font-semibold text-primary">- Dr. Megha Shaha</p>
+                    <p className="font-serif text-xl font-semibold text-primary">- Dt.Megha Shaha</p>
                   </div>
                 </CardContent>
               </Card>

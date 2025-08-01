@@ -112,7 +112,7 @@ const HeroSection = () => {
           {/* Tagline */}
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 animate-fade-in-up max-w-3xl mx-auto leading-relaxed">
             Live pain-free, energetic, and medicine-free — naturally.
-            <span className="text-primary font-medium"> Dr. Megha Shaha</span> helps women reverse chronic diseases
+            <span className="text-primary font-medium"> Dt. Megha Shaha</span> helps women reverse chronic diseases
             through holistic healing.
           </p>
 
