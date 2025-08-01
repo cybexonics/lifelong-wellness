@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node"
-import nodemailer from "nodemailer"
+import * as nodemailer from "nodemailer"
 
 // Email transporter configuration
 const transporter = nodemailer.createTransporter({
