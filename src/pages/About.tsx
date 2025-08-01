@@ -38,12 +38,12 @@ const About = () => {
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
-                  <Badge className="mb-4">About Dr. Megha</Badge>
+                  <Badge className="mb-4">About DT. Megha</Badge>
                   <h1 className="font-serif text-4xl md:text-5xl font-bold mb-6">
                     Dedicated to <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">Holistic Healing</span>
                   </h1>
                   <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                    Hello! I'm Dr. Megha Shaha, founder of Lifelong Wellness.
+                    Hello! I'm DT. Megha Shaha, founder of Lifelong Wellness.
                     I'm a disease reversal nutritionist, yoga trainer, and naturopathy expert. After losing my mother
                     to illness despite medical treatment, I made it my mission to help women heal naturally without medicine.
                     I work with women struggling with lifestyle diseases like PCOS, acidity, and infertility,
@@ -52,7 +52,7 @@ const About = () => {
                   </p>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
-                      <div className="text-3xl font-bold text-primary">10+</div>
+                      <div className="text-3xl font-bold text-primary">15+</div>
                       <div className="text-sm text-muted-foreground">Years Experience</div>
                     </div>
                     <div className="text-center">
@@ -64,7 +64,7 @@ const About = () => {
                 <div className="relative">
                   <img 
                     src={DoctorImage} 
-                    alt="Dr. Megha Shaha" 
+                    alt="DT. Megha Shaha" 
                     className="w-full max-w-md mx-auto rounded-2xl shadow-elegant"
                   />
                   <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-gradient-lotus rounded-full opacity-20"></div>
