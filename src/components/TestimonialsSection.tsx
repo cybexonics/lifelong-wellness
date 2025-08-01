@@ -8,45 +8,45 @@ const TestimonialsSection = () => {
 
   const testimonials = [
     {
-      name: "Priya Sharma",
+      name: "Vrushali Gandhi",
       condition: "Chronic Fatigue & Hormonal Imbalance",
       rating: 5,
-      text: "After struggling with chronic fatigue for 3 years, Dr. Megha's holistic approach changed my life. I'm now energetic, my hormones are balanced, and I feel like myself again - all without any medications!",
+      text: "मेघा मॅडम आपली शिकवण्याची पद्धत अतिशय साधी व सोपी आहे त्यामुळे आपल्याकडून शिकण्यास एक वेगळाच आनंद मिळाला योगाच नव्हे तर आपण आहाराबद्दल व डायट बद्दल जी काही माहिती सांगितली ती प्रत्यक्षात कृतीत आणल्यामुळे मला दैनंदिन जीवनात दिवसभर फ्रेशनेसपणा जाणवला व शरीरामध्ये ज्या काही व्याधी होत्या त्या देखील कमी झाल्या तरी निश्चितच सर्वांनी त्यांच्या योगाचा लाभ घ्यावा असे मला वाट",
       result: "100% Energy Restored"
     },
     {
-      name: "Anita Gupta", 
-      condition: "Digestive Issues & Weight Management",
+      name: "Priyanka kannadkar", 
+      condition: "Mind, body fitness",
       rating: 5,
-      text: "I had given up hope after trying countless treatments for my digestive problems. Dr. Megha's personalized Ayurvedic plan not only healed my gut but helped me lose 15kg naturally. I feel amazing!",
-      result: "15kg Weight Loss & Perfect Digestion"
+      text: "I have seen a steady improvement in my health after consulting with Megha Mam. She counsels really well. Diet is easily applicable and yoga class is full of variety, well planned over the week. Her flow of taking the asanas is really appreciable. I am thankful to Megha Mam and all the efforts she is taking to improve the community's overall health.",
+      result: ""
     },
     {
       name: "Meera Patel",
       condition: "Anxiety & Sleep Disorders",
       rating: 5,
-      text: "The mindfulness techniques and natural remedies Dr. Megha prescribed transformed my mental health. I sleep peacefully now and my anxiety is completely manageable. Her compassionate approach made all the difference.",
+      text: "The mindfulness techniques and natural remedies Dt. Megha prescribed transformed my mental health. I sleep peacefully now and my anxiety is completely manageable. Her compassionate approach made all the difference.",
       result: "Anxiety-Free Living"
     },
     {
       name: "Rashida Khan",
       condition: "PCOS & Fertility Issues", 
       rating: 5,
-      text: "After being told I might never conceive naturally, Dr. Megha's integrated treatment plan helped regulate my PCOS. I'm now a proud mother of a healthy baby girl! Her expertise in women's health is unmatched.",
+      text: "After being told I might never conceive naturally, Dt. Megha's integrated treatment plan helped regulate my PCOS. I'm now a proud mother of a healthy baby girl! Her expertise in women's health is unmatched.",
       result: "Natural Pregnancy Success"
     },
     {
       name: "Sunita Joshi",
       condition: "Arthritis & Joint Pain",
       rating: 5,
-      text: "Years of joint pain had limited my mobility. Through Dr. Megha's natural treatments and lifestyle changes, I'm now pain-free and more active than I've been in a decade. No more dependency on painkillers!",
+      text: "Years of joint pain had limited my mobility. Through Dt. Megha's natural treatments and lifestyle changes, I'm now pain-free and more active than I've been in a decade. No more dependency on painkillers!",
       result: "Complete Pain Relief"
     },
     {
       name: "Kavita Reddy",
       condition: "Skin Issues & Autoimmune Condition",
       rating: 5,
-      text: "My severe eczema and autoimmune condition improved dramatically with Dr. Megha's holistic protocol. My skin is clear, my energy is high, and I finally understand how to care for my body naturally.",
+      text: "My severe eczema and autoimmune condition improved dramatically with Dt. Megha's holistic protocol. My skin is clear, my energy is high, and I finally understand how to care for my body naturally.",
       result: "Clear Skin & Immune Balance"
     }
   ]
