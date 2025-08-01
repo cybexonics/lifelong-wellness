@@ -169,14 +169,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Set CORS headers
   const allowedOrigins = [
     "https://www.lifelongwellness.co.in",
+    "https://lifelong-wellness-ftia-5spkyxm78.vercel.app",
     "https://lifelongwellness.co.in",
     "http://localhost:3000",
     "http://localhost:5173",
   ]
 
   const origin = req.headers.origin
-  if (allowedOrigins.includes(origin || "")) {
-    res.setHeader("Access-Control-Allow-Origin", origin || "*")
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin)
   }
 
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
