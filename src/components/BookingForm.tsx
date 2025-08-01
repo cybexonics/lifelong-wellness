@@ -1,14 +1,12 @@
 "use client"
 
-import type React from "react"
-
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Calendar, CheckCircle, Phone } from "lucide-react"
-import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 
 const BookingForm = () => {
@@ -29,23 +27,19 @@ const BookingForm = () => {
 
     try {
       const fullName = `${formData.name} ${formData.surname}`.trim()
-      const submitData = {
-        fullName,
-        email: formData.email,
-        phone: formData.phone,
-        consultationType: formData.consultationType,
-        message: formData.message,
-        type: "booking",
-      }
+      const submitData = new FormData()
 
-      console.log("Submitting booking form:", submitData)
+      submitData.append("fullName", fullName)
+      submitData.append("email", formData.email)
+      submitData.append("phone", formData.phone)
+      submitData.append("consultationType", formData.consultationType)
+      submitData.append("message", formData.message)
+      submitData.append("type", "consultation")
 
       const response = await fetch("https://www.lifelongwellness.co.in/api/send-email", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(submitData),
+        body: submitData,
+        credentials: "include",
       })
 
       const data = await response.json()
@@ -53,8 +47,7 @@ const BookingForm = () => {
       if (response.ok && data.success) {
         toast({
           title: "🎉 Success!",
-          description:
-            "Your consultation request has been sent. We'll contact you soon. Check your email for confirmation!",
+          description: "Your consultation request has been sent. We'll contact you soon. Check your email for confirmation!",
         })
         setFormData({
           name: "",
@@ -94,7 +87,7 @@ const BookingForm = () => {
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4">
               Book Your{" "}
               <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
-                 Consultation
+                Consultation
               </span>
             </h2>
             <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
