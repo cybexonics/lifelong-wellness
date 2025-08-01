@@ -37,36 +37,38 @@ const BookingForm = () => {
       submitData.append("type", "consultation")
 
       const response = await fetch("https://www.lifelongwellness.co.in/api/send-email", {
-        method: "POST",
-        body: submitData,
-        credentials: "include",
-      })
+  method: "POST",
+  body: submitData,
+  credentials: "include",
+})
 
-      let data
-      const contentType = response.headers.get("content-type")
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json()
-      } else {
-        const text = await response.text()
-        throw new Error(text)
-      }
+const text = await response.text()
 
-      if (response.ok && data.success) {
-        toast({
-          title: "🎉 Success!",
-          description: "Your consultation request has been sent. We'll contact you soon. Check your email for confirmation!",
-        })
-        setFormData({
-          name: "",
-          surname: "",
-          email: "",
-          phone: "",
-          consultationType: "",
-          message: "",
-        })
-      } else {
-        throw new Error(data.message || "Failed to send message")
-      }
+let data
+try {
+  data = JSON.parse(text)
+} catch (err) {
+  throw new Error("Server response is not valid JSON: " + text)
+}
+
+if (response.ok && data.success) {
+  toast({
+    title: "🎉 Success!",
+    description: "Your consultation request has been sent. We'll contact you soon. Check your email for confirmation!",
+  })
+  setFormData({
+    name: "",
+    surname: "",
+    email: "",
+    phone: "",
+    consultationType: "",
+    message: "",
+  })
+} else {
+  throw new Error(data.message || "Failed to send message")
+}
+
+      
     } catch (error) {
       console.error("Booking form error:", error)
       toast({
