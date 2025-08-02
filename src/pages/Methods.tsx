@@ -121,10 +121,7 @@ const Methods = () => {
                   <Play className="w-5 h-5" />
                   Watch Introduction Video
                 </Button>
-                <Button variant="outline" size="lg">
-                  <Download className="w-5 h-5" />
-                  Download Method Guide
-                </Button>
+               
               </div>
             </div>
           </div>
@@ -254,7 +251,7 @@ const Methods = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5">
+        {/* <section className="py-20 bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="font-serif text-3xl md:text-4xl font-bold mb-6">
@@ -302,7 +299,7 @@ const Methods = () => {
               </form>
             </div>
           </div>
-        </section>
+        </section> */}
       </main>
 
       <Footer />
