@@ -13,7 +13,7 @@ const AboutSection = () => {
             <div className="relative w-full max-w-md mx-auto">
               <img 
                 src={DoctorImage} 
-                alt="Dr. Megha Shaha" 
+                alt="DT. Megha Shaha" 
                 className="w-full h-auto rounded-2xl shadow-warm"
               />
               <div className="absolute -bottom-6 -right-6 bg-gradient-primary p-4 rounded-2xl shadow-soft">
@@ -29,7 +29,7 @@ const AboutSection = () => {
           <div className="space-y-8">
             <div>
               <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">
-                Meet <span className="text-primary">Dr. Megha Shaha</span>
+                Meet <span className="text-primary">DT. Megha Shaha</span>
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed mb-6">
                 From a gym shutdown during COVID to discovering her true calling — Dr. Megha's journey began with a profound realization that healing comes from within, not from medicine bottles.

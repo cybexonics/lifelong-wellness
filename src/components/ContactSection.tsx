@@ -20,7 +20,7 @@ const ContactSection = () => {
     e.preventDefault()
     toast({
       title: "Message Sent!",
-      description: "Dr. Megha will get back to you within 24 hours.",
+      description: "DT. Megha will get back to you within 24 hours.",
     })
     setFormData({ name: '', email: '', phone: '', concern: '', message: '' })
   }
