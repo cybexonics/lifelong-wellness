@@ -96,47 +96,42 @@ const Methods = () => {
     }
   ]
 
- return (
-  <div className="min-h-screen bg-background">
-    <Navigation />
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
 
-    <main className="pt-16">
-      {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-background via-secondary/20 to-background">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-4">Healing Methods</Badge>
-            <h1 className="font-serif text-4xl md:text-5xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
-                Natural Healing
-              </span>{" "}
-              Methods & Techniques
-            </h1>
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              Discover the comprehensive range of evidence-based natural healing methods
-              we use to address the root causes of illness and promote lasting wellness.
-            </p>
-
-            {/* This was left open - closing it now */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="healing" size="lg">
-                <Play className="w-5 h-5" />
-                Watch Introduction Video
-              </Button>
-              <Button variant="outline" size="lg">
-                <Download className="w-5 h-5" />
-                Download Method Guide
-              </Button>
+      <main className="pt-16">
+        {/* Hero Section */}
+        <section className="py-20 bg-gradient-to-br from-background via-secondary/20 to-background">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <Badge className="mb-4">Healing Methods</Badge>
+              <h1 className="font-serif text-4xl md:text-5xl font-bold mb-6">
+                <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
+                  Natural Healing
+                </span>{" "}
+                Methods & Techniques
+              </h1>
+              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+                Discover the comprehensive range of evidence-based natural healing methods
+                we use to address the root causes of illness and promote lasting wellness.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button variant="healing" size="lg">
+                  <Play className="w-5 h-5" />
+                  Watch Introduction Video
+                </Button>
+                <Button variant="outline" size="lg">
+                  <Download className="w-5 h-5" />
+                  Download Method Guide
+                </Button>
+              </div>
             </div>
-
           </div>
-        </div>
-      </section>
-      </main>
-      
+        </section>
 
-      {/* Methods Grid */}
-      <section className="py-20">
+        {/* Methods Grid */}
+        <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -260,59 +255,59 @@ const Methods = () => {
 
         {/* CTA Section */}
         <section className="py-20 bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5">
-  <div className="container mx-auto px-4">
-    <div className="max-w-4xl mx-auto text-center">
-      <h2 className="font-serif text-3xl md:text-4xl font-bold mb-6">
-        Ready to Begin Your Healing Journey?
-      </h2>
-      <p className="text-xl text-muted-foreground mb-8">
-        Book a consultation to discover which methods are perfect for your unique needs.
-      </p>
-
-      <form className="max-w-xl mx-auto text-left space-y-4 mt-6">
-        <div>
-          <label className="block mb-1 font-medium text-gray-700">Full Name</label>
-          <input
-            type="text"
-            placeholder="Enter your full name"
-            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
-        <div>
-          <label className="block mb-1 font-medium text-gray-700">Email</label>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
-        <div>
-          <label className="block mb-1 font-medium text-gray-700">Phone Number</label>
-          <input
-            type="tel"
-            placeholder="Enter your phone number"
-            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
-        <div>
-          <label className="block mb-1 font-medium text-gray-700">Message</label>
-          <textarea
-            rows={4}
-            placeholder="What would you like help with?"
-            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
-          ></textarea>
-        </div>
-        <Button type="submit" variant="healing" size="lg" className="w-full">
-          Submit Consultation Request
-        </Button>
-      </form>
-    </div>
-  </div>
-</section>
-
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="font-serif text-3xl md:text-4xl font-bold mb-6">
+                Ready to Begin Your Healing Journey?
+              </h2>
+              <p className="text-xl text-muted-foreground mb-8">
+                Book a consultation to discover which methods are perfect for your unique needs.
+              </p>
+              <form className="max-w-xl mx-auto text-left space-y-4 mt-6">
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">Full Name</label>
+                  <input
+                    type="text"
+                    placeholder="Enter your full name"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">Email</label>
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">Phone Number</label>
+                  <input
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">Message</label>
+                  <textarea
+                    rows={4}
+                    placeholder="What would you like help with?"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
+                  ></textarea>
+                </div>
+                <Button type="submit" variant="healing" size="lg" className="w-full">
+                  Submit Consultation Request
+                </Button>
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
 
       <Footer />
     </div>
+  )
+}
 
-              );
-            }
+export default Methods
