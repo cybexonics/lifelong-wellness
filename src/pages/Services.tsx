@@ -58,6 +58,110 @@ const Services = () => {
       color: "text-green-600",
       bgColor: "bg-green-50"
     },
+    {
+      icon: Brain,
+      title: "Mood Swings Balance",
+      description: "Natural approaches to stabilize emotions and achieve mental equilibrium through mindfulness, nutrition, and lifestyle modifications.",
+      benefits: [
+        "Emotional regulation techniques",
+        "Stress-reducing mindfulness practices",
+        "Hormonal balance through nutrition",
+        "Sleep optimization strategies"
+      ],
+      color: "text-purple-600",
+      bgColor: "bg-purple-50"
+    },
+    {
+      icon: Activity,
+      title: "Diabetes Management",
+      description: "Holistic diabetes care focusing on blood sugar regulation, insulin sensitivity, and preventing complications through natural methods.",
+      benefits: [
+        "Blood sugar stabilization protocols",
+        "Insulin sensitivity improvement",
+        "Diabetic-friendly meal planning",
+        "Natural supplement guidance"
+      ],
+      color: "text-blue-600",
+      bgColor: "bg-blue-50"
+    },
+    {
+      icon: Heart,
+      title: "Hypertension Control",
+      description: "Natural blood pressure management through dietary changes, stress reduction, and lifestyle modifications without medication dependency.",
+      benefits: [
+        "DASH diet implementation",
+        "Sodium reduction strategies",
+        "Stress management techniques",
+        "Heart-healthy lifestyle coaching"
+      ],
+      color: "text-red-600",
+      bgColor: "bg-red-50"
+    },
+    {
+      icon: Shield,
+      title: "Thyroid Optimization",
+      description: "Comprehensive thyroid health support addressing hypothyroidism, hyperthyroidism, and autoimmune thyroid conditions naturally.",
+      benefits: [
+        "Thyroid-supporting nutrition",
+        "Hormone balance restoration",
+        "Autoimmune protocol guidance",
+        "Energy level improvement"
+      ],
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50"
+    },
+    {
+      icon: Flower2,
+      title: "PCOS Management",
+      description: "Specialized treatment for Polycystic Ovary Syndrome focusing on hormonal balance, weight management, and fertility enhancement.",
+      benefits: [
+        "Hormonal balance restoration",
+        "Insulin resistance management",
+        "Natural fertility enhancement",
+        "Menstrual cycle regulation"
+      ],
+      color: "text-pink-600",
+      bgColor: "bg-pink-50"
+    },
+    {
+      icon: Zap,
+      title: "PCOD Management",
+      description: "Targeted approach for Polycystic Ovarian Disease with focus on metabolic health, weight management, and symptom relief.",
+      benefits: [
+        "Metabolic syndrome reversal",
+        "Weight management support",
+        "Acne and hirsutism treatment",
+        "Ovarian function improvement"
+      ],
+      color: "text-yellow-600",
+      bgColor: "bg-yellow-50"
+    },
+    {
+      icon: Bone,
+      title: "Arthritis Relief",
+      description: "Natural joint health restoration through anti-inflammatory protocols, pain management, and mobility improvement strategies.",
+      benefits: [
+        "Joint inflammation reduction",
+        "Natural pain relief methods",
+        "Mobility improvement exercises",
+        "Cartilage health support"
+      ],
+      color: "text-orange-600",
+      bgColor: "bg-orange-50"
+    },
+    {
+      icon: Smile,
+      title: "Stress Management",
+      description: "Comprehensive stress reduction program combining mindfulness, breathing techniques, and lifestyle modifications for mental wellness.",
+      benefits: [
+        "Mindfulness meditation training",
+        "Breathing technique mastery",
+        "Work-life balance strategies",
+        "Anxiety reduction protocols"
+      ],
+      color: "text-teal-600",
+      bgColor: "bg-teal-50"
+    }
     // ... (rest of your services array remains the same)
   ]
 
