@@ -138,18 +138,7 @@ const Gallery = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-16 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-6">
-            Ready to Begin Your Wellness Journey?
-          </h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Experience our healing environment firsthand. Book a consultation to start your personalized path to optimal
-            health and wellness.
-          </p>
-          
-        </div>
-      </section>
+    
 
       <Footer />
     </div>
