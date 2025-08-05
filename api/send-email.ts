@@ -1,32 +1,32 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node"
-import * as nodemailer from "nodemailer"
-import type { Attachment } from "nodemailer/lib/mailer"
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import * as nodemailer from "nodemailer";
+import type { Attachment } from "nodemailer/lib/mailer";
 
-// Email transporter configuration
+// Email transporter configuration (Gmail SMTP)
 const transporter = nodemailer.createTransport({
   service: "gmail",
   host: "smtp.gmail.com",
   port: 587,
   secure: false,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.EMAIL_USER, // lifelongwellnessmegha@gmail.com
+    pass: process.env.EMAIL_PASS, // App password
   },
   tls: {
     rejectUnauthorized: false,
   },
-})
+});
 
-// Email template functions
+// Email template for admin (owner)
 const createEmailTemplate = (data: {
-  fullName: string
-  email: string
-  phone: string
-  message?: string
-  consultationType?: string
-  type: "consultation" | "contact" | "callback"
+  fullName: string;
+  email: string;
+  phone: string;
+  message?: string;
+  consultationType?: string;
+  type: "consultation" | "contact" | "callback";
 }): string => {
-  const isConsultation = data.type === "consultation"
+  const isConsultation = data.type === "consultation";
   return `
     <!DOCTYPE html>
     <html>
@@ -60,33 +60,32 @@ const createEmailTemplate = (data: {
         
         ${
           data.consultationType
-            ? `
-        <div class="field">
-          <strong>Consultation Type:</strong> ${data.consultationType}
-        </div>`
+            ? `<div class="field">
+                <strong>Consultation Type:</strong> ${data.consultationType}
+               </div>`
             : ""
         }
         
         ${
           data.message
-            ? `
-        <div class="field">
-          <strong>Message:</strong> ${data.message.replace(/\n/g, "<br>")}
-        </div>`
+            ? `<div class="field">
+                <strong>Message:</strong> ${data.message.replace(/\n/g, "<br>")}
+               </div>`
             : ""
         }
       </div>
     </body>
     </html>
-  `
-}
+  `;
+};
 
+// Auto-reply template for user
 const createAutoReplyTemplate = (data: {
-  fullName: string
-  type: "consultation" | "contact" | "callback"
+  fullName: string;
+  type: "consultation" | "contact" | "callback";
 }): string => {
-  const isConsultation = data.type === "consultation"
-  const firstName = data.fullName.split(" ")[0] || data.fullName
+  const isConsultation = data.type === "consultation";
+  const firstName = data.fullName.split(" ")[0] || data.fullName;
   return `
     <!DOCTYPE html>
     <html>
@@ -123,115 +122,114 @@ const createAutoReplyTemplate = (data: {
       </div>
     </body>
     </html>
-  `
-}
+  `;
+};
 
-// Simple multipart parser for Vercel Functions
+// Parse multipart form data (for file uploads)
 const parseMultipartData = async (
   req: VercelRequest,
 ): Promise<{ fields: Record<string, string>; files: Record<string, Buffer> }> => {
   return new Promise((resolve, reject) => {
-    const chunks: Buffer[] = []
+    const chunks: Buffer[] = [];
 
     req.on("data", (chunk) => {
-      chunks.push(chunk)
-    })
+      chunks.push(chunk);
+    });
 
     req.on("end", () => {
       try {
-        const buffer = Buffer.concat(chunks)
-        const boundary = req.headers["content-type"]?.split("boundary=")[1]
+        const buffer = Buffer.concat(chunks);
+        const boundary = req.headers["content-type"]?.split("boundary=")[1];
 
         if (!boundary) {
-          resolve({ fields: {}, files: {} })
-          return
+          resolve({ fields: {}, files: {} });
+          return;
         }
 
-        const parts = buffer.toString().split(`--${boundary}`)
-        const fields: Record<string, string> = {}
-        const files: Record<string, Buffer> = {}
+        const parts = buffer.toString().split(`--${boundary}`);
+        const fields: Record<string, string> = {};
+        const files: Record<string, Buffer> = {};
 
         for (const part of parts) {
           if (part.includes("Content-Disposition: form-data")) {
-            const nameMatch = part.match(/name="([^"]+)"/)
-            if (!nameMatch) continue
+            const nameMatch = part.match(/name="([^"]+)"/);
+            if (!nameMatch) continue;
 
-            const fieldName = nameMatch[1]
+            const fieldName = nameMatch[1];
 
             if (part.includes("Content-Type:")) {
-              // This is a file
-              const contentStart = part.indexOf("\r\n\r\n") + 4
-              const contentEnd = part.lastIndexOf("\r\n")
+              // File upload
+              const contentStart = part.indexOf("\r\n\r\n") + 4;
+              const contentEnd = part.lastIndexOf("\r\n");
               if (contentStart < contentEnd) {
-                const fileContent = Buffer.from(part.slice(contentStart, contentEnd), "binary")
-                files[fieldName] = fileContent
+                const fileContent = Buffer.from(part.slice(contentStart, contentEnd), "binary");
+                files[fieldName] = fileContent;
               }
             } else {
-              // This is a regular field
-              const valueStart = part.indexOf("\r\n\r\n") + 4
-              const valueEnd = part.lastIndexOf("\r\n")
+              // Regular field
+              const valueStart = part.indexOf("\r\n\r\n") + 4;
+              const valueEnd = part.lastIndexOf("\r\n");
               if (valueStart < valueEnd) {
-                fields[fieldName] = part.slice(valueStart, valueEnd).trim()
+                fields[fieldName] = part.slice(valueStart, valueEnd).trim();
               }
             }
           }
         }
 
-        resolve({ fields, files })
+        resolve({ fields, files });
       } catch (error) {
-        reject(error)
+        reject(error);
       }
-    })
+    });
 
-    req.on("error", reject)
-  })
-}
+    req.on("error", reject);
+  });
+};
 
+// Main handler
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Set CORS headers
+  // CORS setup
   const allowedOrigins = [
     "https://www.lifelongwellness.co.in",
     "https://lifelong-wellness-ftia-5spkyxm78.vercel.app",
     "https://lifelongwellness.co.in",
     "http://localhost:3000",
     "http://localhost:5173",
-  ]
+  ];
 
-  const origin = req.headers.origin
+  const origin = req.headers.origin;
   if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin)
+    res.setHeader("Access-Control-Allow-Origin", origin);
   }
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
-  res.setHeader("Access-Control-Allow-Credentials", "true")
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
 
   // Handle OPTIONS request
   if (req.method === "OPTIONS") {
-    return res.status(200).end()
+    return res.status(200).end();
   }
 
   // Only allow POST requests
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, message: "Method not allowed" })
+    return res.status(405).json({ success: false, message: "Method not allowed" });
   }
 
   try {
-    let fields: Record<string, string> = {}
-    let files: Record<string, Buffer> = {}
+    let fields: Record<string, string> = {};
+    let files: Record<string, Buffer> = {};
 
-    // Check if it's multipart form data
-    const contentType = req.headers["content-type"] || ""
+    // Parse request data
+    const contentType = req.headers["content-type"] || "";
 
     if (contentType.includes("multipart/form-data")) {
-      const parsed = await parseMultipartData(req)
-      fields = parsed.fields
-      files = parsed.files
+      const parsed = await parseMultipartData(req);
+      fields = parsed.fields;
+      files = parsed.files;
     } else if (contentType.includes("application/json")) {
-      // Handle JSON data
-      fields = req.body || {}
+      fields = req.body || {};
     } else {
-      // Handle URL encoded data
-      fields = req.body || {}
+      fields = req.body || {};
     }
 
     // Validate required fields
@@ -239,7 +237,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({
         success: false,
         message: "Email and phone are required fields",
-      })
+      });
     }
 
     // Prepare email data
@@ -250,59 +248,60 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       message: fields.message || fields.concern || "",
       consultationType: fields.consultationType || "",
       type: (fields.type as "consultation" | "contact" | "callback") || "contact",
-    }
+    };
 
-    // Prepare attachments
-    const attachments: Attachment[] = []
-
+    // Prepare attachments (if any)
+    const attachments: Attachment[] = [];
     if (files.paymentScreenshot) {
       attachments.push({
         filename: "payment-screenshot.jpg",
         content: files.paymentScreenshot,
-      })
+      });
     }
 
-    // Send email with retry logic
+    // Email retry logic
     const sendWithRetry = async (mailOptions: nodemailer.SendMailOptions, retries = 3): Promise<any> => {
       try {
-        return await transporter.sendMail(mailOptions)
+        return await transporter.sendMail(mailOptions);
       } catch (error) {
-        console.error(`Email send attempt failed (${4 - retries}/3):`, error)
+        console.error(`Email send attempt failed (${4 - retries}/3):`, error);
         if (retries > 0) {
-          await new Promise((resolve) => setTimeout(resolve, 2000))
-          return sendWithRetry(mailOptions, retries - 1)
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          return sendWithRetry(mailOptions, retries - 1);
         }
-        throw error
+        throw error;
       }
-    }
+    };
 
-    // Send to admin
+    // 1️⃣ Send to admin (appears as FROM user's email)
     await sendWithRetry({
-      from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`,
-      to: "lifelongwellnessmegha@gmail.com",
+      from: `"${emailData.fullName}" <${process.env.EMAIL_USER}>`, // Authenticated via Gmail but appears as user
+      sender: process.env.EMAIL_USER, // Actual sender (required for Gmail)
+      replyTo: emailData.email, // Replies go to user
+      to: "lifelongwellnessmegha@gmail.com", // Owner's email
       subject: `New ${emailData.type === "consultation" ? "Consultation" : "Contact"} Request`,
       html: createEmailTemplate(emailData),
       attachments,
-    })
+    });
 
-    // Send auto-reply
+    // 2️⃣ Send auto-reply to user (FROM owner's email)
     await sendWithRetry({
-      from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`,
-      to: emailData.email,
+      from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`, // From owner
+      to: emailData.email, // User's email
       subject: emailData.type === "consultation" ? "Your Consultation Request Received" : "Thank You for Contacting Us",
       html: createAutoReplyTemplate(emailData),
-    })
+    });
 
     res.status(200).json({
       success: true,
       message: "Email sent successfully",
-    })
+    });
   } catch (error: any) {
-    console.error("Email function error:", error)
+    console.error("Email function error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to send email",
       error: process.env.NODE_ENV === "development" ? error.message : "Internal server error",
-    })
+    });
   }
 }
