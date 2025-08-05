@@ -138,7 +138,7 @@ const Gallery = () => {
       </section>
 
       {/* Call to Action */}
-    
+      
 
       <Footer />
     </div>

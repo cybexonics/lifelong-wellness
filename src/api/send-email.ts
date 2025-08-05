@@ -23,7 +23,7 @@ export const sendEmail = async (data: EmailData, type: "consultation" | "callbac
         name: "Lifelong Wellness Website",
         address: process.env.EMAIL_USER || "noreply@lifelongwellness.com",
       },
-      to: "rahulsharma18535@gmail.com", // Destination email
+      to: "lifelongwellnessmegha@gmail.com", // Destination email
       subject: subject,
       html: html,
       replyTo: data.email, // Allow direct reply to the user
