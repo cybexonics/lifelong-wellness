@@ -2,23 +2,23 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import * as nodemailer from "nodemailer";
 import type { Attachment } from "nodemailer/lib/mailer";
 
-// Email transporter configuration (Gmail SMTP)
+// Email transporter configuration
 const transporter = nodemailer.createTransport({
   service: "gmail",
   host: "smtp.gmail.com",
   port: 587,
   secure: false,
   auth: {
-    user: process.env.EMAIL_USER, // lifelongwellnessmegha@gmail.com
-    pass: process.env.EMAIL_PASS, // App password
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
   tls: {
     rejectUnauthorized: false,
   },
 });
 
-// Email template for admin (owner)
-const createEmailTemplate = (data: {
+// Email template for admin
+const createAdminEmailTemplate = (data: {
   fullName: string;
   email: string;
   phone: string;
@@ -37,6 +37,7 @@ const createEmailTemplate = (data: {
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { background: #059669; color: white; padding: 20px; text-align: center; }
         .field { margin: 15px 0; padding: 15px; background: #f0fdf4; border-radius: 8px; }
+        .notice { background: #f5f5f5; padding: 10px; border-left: 4px solid #059669; }
       </style>
     </head>
     <body>
@@ -44,6 +45,11 @@ const createEmailTemplate = (data: {
         <div class="header">
           <h2>🌿 Lifelong Wellness</h2>
           <p>New ${isConsultation ? "Consultation" : "Contact"} Request</p>
+        </div>
+        
+        <div class="notice">
+          <p>This message was submitted through your website contact form by:</p>
+          <p><strong>${data.fullName}</strong> (${data.email})</p>
         </div>
         
         <div class="field">
@@ -58,21 +64,15 @@ const createEmailTemplate = (data: {
           <strong>Phone:</strong> ${data.phone}
         </div>
         
-        ${
-          data.consultationType
-            ? `<div class="field">
-                <strong>Consultation Type:</strong> ${data.consultationType}
-               </div>`
-            : ""
-        }
+        ${data.consultationType ? `
+        <div class="field">
+          <strong>Consultation Type:</strong> ${data.consultationType}
+        </div>` : ''}
         
-        ${
-          data.message
-            ? `<div class="field">
-                <strong>Message:</strong> ${data.message.replace(/\n/g, "<br>")}
-               </div>`
-            : ""
-        }
+        ${data.message ? `
+        <div class="field">
+          <strong>Message:</strong> ${data.message.replace(/\n/g, "<br>")}
+        </div>` : ''}
       </div>
     </body>
     </html>
@@ -114,7 +114,7 @@ const createAutoReplyTemplate = (data: {
         
         <p>For immediate assistance, please contact us at:</p>
         <p><strong>Phone/WhatsApp:</strong> +91 94210 69326</p>
-        <p><strong>Email:</strong> meghahshaha@gmail.com</p>
+        <p><strong>Email:</strong> lifelongwellnessmegha@gmail.com</p>
         
         <p>Best regards,<br>
         <strong>Dr. Megha Shaha</strong><br>
@@ -125,9 +125,9 @@ const createAutoReplyTemplate = (data: {
   `;
 };
 
-// Parse multipart form data (for file uploads)
+// Parse multipart form data
 const parseMultipartData = async (
-  req: VercelRequest,
+  req: VercelRequest
 ): Promise<{ fields: Record<string, string>; files: Record<string, Buffer> }> => {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
@@ -158,15 +158,16 @@ const parseMultipartData = async (
             const fieldName = nameMatch[1];
 
             if (part.includes("Content-Type:")) {
-              // File upload
               const contentStart = part.indexOf("\r\n\r\n") + 4;
               const contentEnd = part.lastIndexOf("\r\n");
               if (contentStart < contentEnd) {
-                const fileContent = Buffer.from(part.slice(contentStart, contentEnd), "binary");
+                const fileContent = Buffer.from(
+                  part.slice(contentStart, contentEnd),
+                  "binary"
+                );
                 files[fieldName] = fileContent;
               }
             } else {
-              // Regular field
               const valueStart = part.indexOf("\r\n\r\n") + 4;
               const valueEnd = part.lastIndexOf("\r\n");
               if (valueStart < valueEnd) {
@@ -186,12 +187,27 @@ const parseMultipartData = async (
   });
 };
 
-// Main handler
+// Email sending with retry logic
+const sendWithRetry = async (
+  mailOptions: nodemailer.SendMailOptions,
+  retries = 3
+): Promise<any> => {
+  try {
+    return await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error(`Email send attempt failed (${4 - retries}/3):`, error);
+    if (retries > 0) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      return sendWithRetry(mailOptions, retries - 1);
+    }
+    throw error;
+  }
+};
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS setup
   const allowedOrigins = [
     "https://www.lifelongwellness.co.in",
-    "https://lifelong-wellness-ftia-5spkyxm78.vercel.app",
     "https://lifelongwellness.co.in",
     "http://localhost:3000",
     "http://localhost:5173",
@@ -201,10 +217,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (origin && allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  
   // Handle OPTIONS request
   if (req.method === "OPTIONS") {
     return res.status(200).end();
@@ -221,7 +236,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Parse request data
     const contentType = req.headers["content-type"] || "";
-
     if (contentType.includes("multipart/form-data")) {
       const parsed = await parseMultipartData(req);
       fields = parsed.fields;
@@ -250,7 +264,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       type: (fields.type as "consultation" | "contact" | "callback") || "contact",
     };
 
-    // Prepare attachments (if any)
+    // Prepare attachments
     const attachments: Attachment[] = [];
     if (files.paymentScreenshot) {
       attachments.push({
@@ -259,49 +273,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Email retry logic
-    const sendWithRetry = async (mailOptions: nodemailer.SendMailOptions, retries = 3): Promise<any> => {
-      try {
-        return await transporter.sendMail(mailOptions);
-      } catch (error) {
-        console.error(`Email send attempt failed (${4 - retries}/3):`, error);
-        if (retries > 0) {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-          return sendWithRetry(mailOptions, retries - 1);
-        }
-        throw error;
-      }
-    };
-
-    // 1️⃣ Send to admin (appears as FROM user's email)
+    // Send to ADMIN (appears to come from user)
     await sendWithRetry({
-      from: `"${emailData.fullName}" <${process.env.EMAIL_USER}>`, // Authenticated via Gmail but appears as user
-      sender: process.env.EMAIL_USER, // Actual sender (required for Gmail)
-      replyTo: emailData.email, // Replies go to user
-      to: "lifelongwellnessmegha@gmail.com", // Owner's email
+      from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`, // Authenticated sender
+      to: "lifelongwellnessmegha@gmail.com", // Admin email
+      replyTo: `"${emailData.fullName}" <${emailData.email}>`, // Replies go to user
       subject: `New ${emailData.type === "consultation" ? "Consultation" : "Contact"} Request`,
-      html: createEmailTemplate(emailData),
+      html: createAdminEmailTemplate(emailData),
       attachments,
     });
 
-    // 2️⃣ Send auto-reply to user (FROM owner's email)
+    // Send AUTO-REPLY to USER
     await sendWithRetry({
-      from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`, // From owner
-      to: emailData.email, // User's email
+      from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`,
+      to: emailData.email,
       subject: emailData.type === "consultation" ? "Your Consultation Request Received" : "Thank You for Contacting Us",
       html: createAutoReplyTemplate(emailData),
     });
 
-    res.status(200).json({
-      success: true,
-      message: "Email sent successfully",
-    });
+    res.status(200).json({ success: true, message: "Email sent successfully" });
   } catch (error: any) {
-    console.error("Email function error:", error);
+    console.error("Email error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to send email",
-      error: process.env.NODE_ENV === "development" ? error.message : "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 }
