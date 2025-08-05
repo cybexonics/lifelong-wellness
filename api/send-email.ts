@@ -279,7 +279,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Send to admin
     await sendWithRetry({
       from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`,
-      to: "meghahshaha@gmail.com",
+      to: "lifelongwellnessmegha@gmail.com",
       subject: `New ${emailData.type === "consultation" ? "Consultation" : "Contact"} Request`,
       html: createEmailTemplate(emailData),
       attachments,
