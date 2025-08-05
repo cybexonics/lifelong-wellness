@@ -138,38 +138,7 @@ const Gallery = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-16 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-6">
-            Ready to Begin Your Wellness Journey?
-          </h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Experience our healing environment firsthand. Book a consultation to start your personalized path to optimal
-            health and wellness.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => {
-                const element = document.querySelector("#booking")
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" })
-                } else {
-                  window.location.href = "/#booking"
-                }
-              }}
-              className="px-8 py-4 bg-primary text-primary-foreground rounded-full font-semibold hover:bg-primary/90 transition-colors duration-300"
-            >
-              Book Consultation
-            </button>
-            <button
-              onClick={() => (window.location.href = "/contact")}
-              className="px-8 py-4 bg-secondary text-secondary-foreground rounded-full font-semibold hover:bg-secondary/90 transition-colors duration-300"
-            >
-              Contact Us
-            </button>
-          </div>
-        </div>
-      </section>
+      
 
       <Footer />
     </div>
