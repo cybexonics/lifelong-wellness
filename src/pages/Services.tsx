@@ -15,8 +15,14 @@ import {
   CheckCircle,
   ArrowRight,
   Phone,
-  
 } from "lucide-react"
+import { useState } from "react"
+import { useToast } from "@/hooks/use-toast"
+import { sendEmailRequest } from "@/utils/emailService"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 
 // Define Apple icon component before using it in the services array
 const Apple = ({ className }: { className?: string }) => (
@@ -26,8 +32,20 @@ const Apple = ({ className }: { className?: string }) => (
 )
 
 const Services = () => {
+  const [isCallDialogOpen, setIsCallDialogOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    concern: "",
+    message: "",
+  })
+
   const services = [
-    {
+   {
       icon: Apple,
       title: "Disease Reversal Diet",
       description: "Comprehensive nutritional therapy to reverse chronic diseases naturally through personalized meal plans and food as medicine approach.",
@@ -144,7 +162,47 @@ const Services = () => {
       color: "text-teal-600",
       bgColor: "bg-teal-50"
     }
+    // ... (rest of your services array remains the same)
   ]
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      const result = await sendEmailRequest({
+        ...formData,
+        type: "callback",
+      })
+
+      if (result.success) {
+        toast({
+          title: "Call Request Sent!",
+          description: result.message,
+        })
+        setFormData({ name: "", email: "", phone: "", concern: "", message: "" })
+        setIsCallDialogOpen(false)
+      } else {
+        toast({
+          title: "Error",
+          description: result.message,
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send call request. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -166,10 +224,113 @@ const Services = () => {
                 and lifestyle conditions. Experience the power of natural healing without medication dependency.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="healing" size="lg">
-                  <Phone className="w-5 h-5" />
-                  Book Free Consultation
-                </Button>
+                <Dialog open={isCallDialogOpen} onOpenChange={setIsCallDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="healing" size="lg">
+                      <Phone className="w-5 h-5" />
+                      Book Consultation
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="font-serif text-2xl flex items-center gap-2">
+                        <Phone className="w-6 h-6 text-primary" />
+                        Request a Call Back
+                      </DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div>
+                        <Label htmlFor="name" className="text-base">Full Name *</Label>
+                        <Input
+                          id="name"
+                          name="name"
+                          type="text"
+                          required
+                          value={formData.name}
+                          onChange={handleChange}
+                          placeholder="Your full name"
+                          className="mt-1 h-12 text-base"
+                          disabled={isLoading}
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="email" className="text-base">Email Address *</Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          required
+                          value={formData.email}
+                          onChange={handleChange}
+                          placeholder="your.email@example.com"
+                          className="mt-1 h-12 text-base"
+                          disabled={isLoading}
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="phone" className="text-base">Phone Number *</Label>
+                        <Input
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          required
+                          value={formData.phone}
+                          onChange={handleChange}
+                          placeholder="+91 98765 43210"
+                          className="mt-1 h-12 text-base"
+                          disabled={isLoading}
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="concern" className="text-base">Primary Health Concern *</Label>
+                        <select
+                          id="concern"
+                          name="concern"
+                          required
+                          value={formData.concern}
+                          onChange={handleChange}
+                          disabled={isLoading}
+                          className="mt-1 w-full p-3 h-12 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 text-base"
+                        >
+                          <option value="">Select your concern</option>
+                          <option value="pcos">PCOS / Hormonal Imbalance</option>
+                          <option value="infertility">Fertility Issues</option>
+                          <option value="weight">Weight Management</option>
+                          <option value="energy">Low Energy / Fatigue</option>
+                          <option value="digestive">Digestive Issues</option>
+                          <option value="other">Other Health Concerns</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="message" className="text-base">Best time to call</Label>
+                        <Textarea
+                          id="message"
+                          name="message"
+                          value={formData.message}
+                          onChange={handleChange}
+                          placeholder="Let us know your preferred time for the call..."
+                          rows={3}
+                          className="mt-1 text-base"
+                          disabled={isLoading}
+                        />
+                      </div>
+
+                      <Button 
+                        type="submit" 
+                        variant="healing" 
+                        className="w-full h-12 text-lg" 
+                        disabled={isLoading}
+                      >
+                        <CheckCircle className="w-6 h-6 mr-2" />
+                        {isLoading ? "Sending..." : "Request Call Back"}
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
                 <Button variant="outline" size="lg">
                   View Success Stories
                   <ArrowRight className="w-5 h-5" />
@@ -217,9 +378,13 @@ const Services = () => {
                             </li>
                           ))}
                         </ul>
-                        <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                          Learn More
-                        </Button>
+                        <Dialog open={isCallDialogOpen} onOpenChange={setIsCallDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                              Learn More
+                            </Button>
+                          </DialogTrigger>
+                        </Dialog>
                       </CardContent>
                     </Card>
                   )
@@ -279,10 +444,14 @@ const Services = () => {
               <p className="text-xl text-muted-foreground mb-8">
                 Book a free consultation to discover which natural treatment approach is perfect for your condition.
               </p>
-              <Button variant="healing" size="xl">
-                <Phone className="w-5 h-5" />
-                Book Free Consultation
-              </Button>
+              <Dialog open={isCallDialogOpen} onOpenChange={setIsCallDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="healing" size="xl">
+                    <Phone className="w-5 h-5" />
+                    Book Consultation
+                  </Button>
+                </DialogTrigger>
+              </Dialog>
             </div>
           </div>
         </section>

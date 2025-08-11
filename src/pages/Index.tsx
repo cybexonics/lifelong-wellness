@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import qr from "@/assets/qr-code.jpg"
 
 const Index = () => {
   const { toast } = useToast()
@@ -237,29 +238,28 @@ const Index = () => {
 
                           {/* QR Code Payment Section */}
                           <div className="text-center mb-4 p-4 bg-gradient-to-br from-primary/5 to-secondary/10 rounded-lg border border-primary/20">
-                            <div className="flex items-center justify-center gap-2 mb-3">
-                              <CreditCard className="w-5 h-5 text-primary" />
-                              <h4 className="font-semibold text-sm text-primary">Pay ₹499 for First Consultation</h4>
-                            </div>
-                            <div className="flex justify-center mb-3">
-                              <div className="relative">
-                                <img
-                                  src="/assets/qr-code.jpg"
-                                  alt="Payment QR Code - Scan to pay ₹499"
-                                  className="w-32 h-40 border-2 border-primary/30 rounded-lg shadow-md object-contain bg-white"
-                                />
-                                <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-bold">
-                                  ₹499
-                                </div>
-                              </div>
-                            </div>
-                            <div className="space-y-1">
-                              <p className="text-xs text-muted-foreground">Scan QR code to pay via UPI</p>
-                              <p className="text-xs font-medium text-primary">UPI ID: 9421069326@sbi</p>
-                              <p className="text-xs text-orange-600 font-medium">⚡ Instant Payment • Secure • SBI</p>
-                            </div>
-                          </div>
-
+  <div className="flex items-center justify-center gap-2 mb-3">
+    <CreditCard className="w-5 h-5 text-primary" />
+    <h4 className="font-semibold text-sm text-primary">Pay ₹499 for First Consultation</h4>
+  </div>
+  <div className="flex justify-center mb-3">
+    <div className="relative">
+      <img
+        src="/qr-code.jpg"
+        alt="Payment QR Code - Scan to pay ₹499"
+        className="w-48 h-60 border-2 border-primary/30 rounded-lg shadow-md object-contain bg-white" 
+      />
+      <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-bold">
+        ₹499
+      </div>
+    </div>
+  </div>
+  <div className="space-y-1">
+    <p className="text-xs text-muted-foreground">Scan QR code to pay via UPI</p>
+    <p className="text-xs font-medium text-primary">UPI ID: 9421069326@sbi</p>
+    <p className="text-xs text-orange-600 font-medium">⚡ Instant Payment • Secure • SBI</p>
+  </div>
+</div>
                           <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
                             <div className="space-y-3 flex-1">
                               <div>
