@@ -269,8 +269,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Send to ADMIN (appears to come from user)
     await sendWithRetry({
-      from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`, // Authenticated sender
-      to: "lifelongwellnessmegha@gmail.com", // Admin email
+      from: {
+        name: "Lifelong Wellness",
+        address: process.env.EMAIL_USER as string // This ensures lifelongwellnessmegha@gmail.com is used
+      },
+      to: process.env.EMAIL_USER as string, // Admin email
       replyTo: `"${emailData.fullName}" <${emailData.email}>`, // Replies go to user
       subject: `New ${emailData.type === "consultation" ? "Consultation" : "Contact"} Request`,
       html: createAdminEmailTemplate(emailData),
@@ -279,7 +282,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Send AUTO-REPLY to USER
     await sendWithRetry({
-      from: `"Lifelong Wellness" <${process.env.EMAIL_USER}>`,
+      from: {
+        name: "Lifelong Wellness",
+        address: process.env.EMAIL_USER as string
+      },
       to: emailData.email,
       subject: emailData.type === "consultation" ? "Your Consultation Request Received" : "Thank You for Contacting Us",
       html: createAutoReplyTemplate(emailData),
