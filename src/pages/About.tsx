@@ -16,7 +16,7 @@ const About = () => {
   const experience = [
     { role: "Chief Holistic Practitioner", place: "Lifelong Wellness Clinic", years: "2018 - Present" },
     { role: "Senior Wellness Consultant", place: "Natural Health Center", years: "2015 - 2018" },
-    { role: "Resident Doctor", place: "City General Hospital", years: "2012 - 2015" }
+   
   ]
 
   const certifications = [

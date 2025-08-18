@@ -171,7 +171,7 @@ const Footer = () => {
 
         <div className="border-t border-border/50 mt-8 pt-8 text-center">
           <p className="text-muted-foreground text-sm">
-           © 2025 Lifelong Wellness by <Dt. Megha Shaha, Cybexonics IT Consultant Pvt. Ltd.<br></br> All rights reserved. Heal naturally, live beautifully.
+           © 2025 Lifelong Wellness by <DT. Megha Shaha, Cybexonics IT Consultant Pvt. Ltd.<br></br> All rights reserved. Heal naturally, live beautifully.
             <span className="text-primary"> Heal naturally, live beautifully.</span>
           </p>
         </div>
