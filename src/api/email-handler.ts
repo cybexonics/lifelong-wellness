@@ -1,5 +1,9 @@
 import nodemailer from 'nodemailer';
 import 'dotenv/config';
+sgMail.setDataResidency('eu');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+sgMail.setDataResidency('eu');
 
 // Create transporter using SendGrid SMTP
 const transporter = nodemailer.createTransport({
