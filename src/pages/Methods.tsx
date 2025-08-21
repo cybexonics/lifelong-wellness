@@ -116,12 +116,17 @@ const Methods = () => {
                 Discover the comprehensive range of evidence-based natural healing methods
                 we use to address the root causes of illness and promote lasting wellness.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="healing" size="lg">
-                  <Play className="w-5 h-5" />
-                  Watch Introduction Video
-                </Button>
-               
+             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+  <a 
+    href="https://youtu.be/Nzo0wlOZRvk?feature=shared" 
+    target="_blank" 
+    rel="noopener noreferrer"
+  >
+    <Button variant="healing" size="lg">
+      <Play className="w-5 h-5" />
+      Watch Introduction Video
+    </Button>
+  </a>         
               </div>
             </div>
           </div>

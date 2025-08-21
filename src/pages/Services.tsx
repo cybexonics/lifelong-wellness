@@ -16,6 +16,7 @@ import {
   ArrowRight,
   Phone,
 } from "lucide-react"
+import Link from "next/link";
 import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { sendEmailRequest } from "@/utils/emailService"
@@ -331,10 +332,12 @@ const Services = () => {
                     </form>
                   </DialogContent>
                 </Dialog>
-                <Button variant="outline" size="lg">
-                  View Success Stories
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
+                <Link href="/gallery">
+  <Button variant="outline" size="lg">
+    View Success Stories
+    <ArrowRight className="w-5 h-5" />
+  </Button>
+</Link>
               </div>
             </div>
           </div>
