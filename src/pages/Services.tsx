@@ -332,11 +332,7 @@ const Services = () => {
                     </form>
                   </DialogContent>
                 </Dialog>
-                <a href="/gallery">
-                  <Button variant="outline" className="mt-4">
-                    View Success Stories
-                  </Button>
-                </a>
+               
               </div>
             </div>
           </div>
