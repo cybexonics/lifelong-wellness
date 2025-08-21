@@ -77,7 +77,7 @@ const Footer = () => {
               {[
                 { label: "PCOS Reversal", to: "/services" },
                 { label: "Fertility Enhancement", to: "/services" },
-                { label: "Weight Management", to: "/servicest" },
+                { label: "Weight Management", to: "/services" },
                 { label: "Hormonal Balance", to: "/services" },
                 { label: "Detox Programs", to: "/services" },
               ].map((service) => (
