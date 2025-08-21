@@ -138,12 +138,17 @@ const Contact = () => {
                           <div className="p-3 bg-primary/10 rounded-full">
                             <Phone className="w-6 h-6 text-primary" />
                           </div>
-                          <div>
-                            <h3 className="font-semibold mb-1">Phone</h3>
-                            <p className="text-muted-foreground">+91 94210 69326</p>
-                            <p className="text-sm text-primary">Call for immediate assistance</p>
-                          </div>
-                        </div>
+                          <div className="space-y-6">
+  {/* Phone */}
+  <div>
+    <h3 className="font-semibold mb-1">Phone</h3>
+    <a href="tel:+919421069326" className="text-muted-foreground block hover:text-green-600">
+      +91 94210 69326
+    </a>
+    <p className="text-green-600">Call for immediate assistance</p>
+  </div>
+        </div>                
+               </div>         
                       </CardContent>
                     </Card>
 
@@ -154,10 +159,17 @@ const Contact = () => {
                             <MessageSquare className="w-6 h-6 text-secondary-accent" />
                           </div>
                           <div>
-                            <h3 className="font-semibold mb-1">WhatsApp</h3>
-                            <p className="text-muted-foreground">+91 94210 69326</p>
-                            <p className="text-sm text-secondary-accent">24x7 Support Available</p>
-                          </div>
+    <h3 className="font-semibold mb-1">WhatsApp</h3>
+    <a 
+      href="https://wa.me/919421069326" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="text-muted-foreground block hover:text-pink-600"
+    >
+      +91 94210 69326
+    </a>
+    <p className="text-pink-600">24×7 Support Available</p>
+  </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -169,10 +181,15 @@ const Contact = () => {
                             <Mail className="w-6 h-6 text-accent-warm" />
                           </div>
                           <div>
-                            <h3 className="font-semibold mb-1">Email</h3>
-                            <p className="text-muted-foreground">meghahshaha@gmail.com</p>
-                            <p className="text-sm text-accent-warm">We respond within 2 hours</p>
-                          </div>
+    <h3 className="font-semibold mb-1">Email</h3>
+    <a 
+      href="mailto:meghahshaha@gmail.com" 
+      className="text-muted-foreground block hover:text-yellow-600"
+    >
+      meghahshaha@gmail.com
+    </a>
+    <p className="text-yellow-600">We respond within 2 hours</p>
+  </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -183,11 +200,35 @@ const Contact = () => {
                           <div className="p-3 bg-primary/10 rounded-full">
                             <MapPin className="w-6 h-6 text-primary" />
                           </div>
+                            </div>
                           <div>
-                            <h3 className="font-semibold mb-1">Clinic Address</h3>
-                            <p className="text-muted-foreground">123 Wellness Street, Health District</p>
-                            <p className="text-muted-foreground">Mumbai, Maharashtra 400001</p>
-                          </div>
+  <h3 className="font-semibold mb-1">Clinic Address</h3>
+
+  {/* Main Clinic */}
+<p className="text-muted-foreground">
+  <a 
+    href="https://maps.app.goo.gl/sbPXPywN2GqqVEUE6" 
+    target="_blank" 
+    rel="noopener noreferrer" 
+    className="hover:text-green-600 underline"
+  >
+    Navjeevan Hospital, Tembhurni Road, Kurduwadi
+  </a>
+</p>
+<p className="text-muted-foreground">Mo. 9420608032</p>
+
+{/* Branch Clinic */}
+<p className="text-muted-foreground mt-4">
+  <a 
+    href="https://maps.app.goo.gl/9LhExyN16LLwcTW57" 
+    target="_blank" 
+    rel="noopener noreferrer" 
+    className="hover:text-green-600 underline"
+  >
+    Branch: 302, Shriniwas Heights, 195 A+B, Shukrawar Peth, Pune 411002
+  </a>
+</p>
+<p className="text-muted-foreground">Mo. 9421069326</p>
                         </div>
                       </CardContent>
                     </Card>
