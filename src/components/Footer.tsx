@@ -171,9 +171,20 @@ const Footer = () => {
 
         <div className="border-t border-border/50 mt-8 pt-8 text-center">
           <p className="text-muted-foreground text-sm">
-           © 2025 Lifelong Wellness by DT. Megha Shaha, Cybexonics IT Consultant Pvt. Ltd.<br></br> All rights reserved. Heal naturally, live beautifully.
-            <span className="text-primary"> Heal naturally, live beautifully.</span>
-          </p>
+  © 2025 Lifelong Wellness by DT. Megha Shaha, Cybexonics IT Consultants Pvt. Ltd.
+  <br />
+  All rights reserved. Heal naturally, live beautifully.
+  <br />
+  Designed by{" "}
+  <a 
+    href="https://cybexonics.com" 
+    className="text-primary hover:underline"
+    target="_blank" 
+    rel="noopener noreferrer"
+  >
+    @Cybexonics IT Consultants Pvt. Ltd.
+  </a>
+</p>
         </div>
       </div>
     </footer>
