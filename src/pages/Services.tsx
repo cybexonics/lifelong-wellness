@@ -333,11 +333,10 @@ const Services = () => {
                   </DialogContent>
                 </Dialog>
                 <a href="/gallery">
-  <Button variant="outline" size="lg">
-    View Success Stories
-    <ArrowRight className="w-5 h-5" />
-  </Button>
-</a>
+                  <Button variant="outline" className="mt-4">
+                    View Success Stories
+                  </Button>
+                </a>
               </div>
             </div>
           </div>
@@ -465,4 +464,5 @@ const Services = () => {
   )
 }
 
-export default Services
+export default Services 
+
