@@ -35,7 +35,7 @@ const Footer = () => {
               <img src={LogoImage} alt="Lifelong Wellness" className="w-12 h-12 rounded-full" /> {/* Increased size */}
               <div>
                 <h3 className="font-serif font-semibold text-lg">Lifelong Wellness</h3>
-                <p className="text-sm text-muted-foreground">Dr. Megha Shaha</p>
+                <p className="text-sm text-muted-foreground">DT. Megha Shaha</p>
               </div>
             </div>
             <p className="text-muted-foreground leading-relaxed">
@@ -171,7 +171,7 @@ const Footer = () => {
 
         <div className="border-t border-border/50 mt-8 pt-8 text-center">
           <p className="text-muted-foreground text-sm">
-           © 2025 Lifelong Wellness by <DT. Megha Shaha, Cybexonics IT Consultant Pvt. Ltd.<br></br> All rights reserved. Heal naturally, live beautifully.
+           © 2025 Lifelong Wellness by DT. Megha Shaha, Cybexonics IT Consultant Pvt. Ltd.<br></br> All rights reserved. Heal naturally, live beautifully.
             <span className="text-primary"> Heal naturally, live beautifully.</span>
           </p>
         </div>
