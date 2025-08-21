@@ -98,10 +98,14 @@ const Footer = () => {
             <h4 className="font-semibold mb-4">Get in Touch</h4>
             <div className="space-y-4">
               <div className="flex items-center gap-3 text-muted-foreground">
-                <Mail className="w-4 h-4 text-primary" />
-                <span className="text-sm">meghahshaha@gmail.com</span>
-              </div>
-              
+  <Mail className="w-4 h-4 text-primary" />
+  <a 
+    href="mailto:meghahshaha@gmail.com" 
+    className="text-sm hover:underline"
+  >
+    meghahshaha@gmail.com
+  </a>
+</div>
               <div className="space-y-2">
                 <Button 
                   variant="wellness" 
