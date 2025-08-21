@@ -103,7 +103,7 @@ const Navigation = () => {
             />
             <div className="ml-2"> {/* Added margin for better spacing */}
               <h1 className="font-serif font-semibold text-2xl text-foreground">Lifelong Wellness</h1>
-              <p className="text-sm text-muted-foreground mt-1">Dr. Megha Shaha</p>
+              <p className="text-sm text-muted-foreground mt-1">Dt. Megha Shaha</p>
             </div>
           </Link>
 
@@ -250,7 +250,7 @@ const Navigation = () => {
                   />
                   <div>
                     <h1 className="font-serif font-semibold text-2xl text-foreground">Lifelong Wellness</h1>
-                    <p className="text-sm text-muted-foreground mt-1">Dr. Megha Shaha</p>
+                    <p className="text-sm text-muted-foreground mt-1">Dt. Megha Shaha</p>
                   </div>
                 </div>
 
