@@ -10,7 +10,7 @@ const Footer = () => {
   // Social media links
   const socialLinks = {
     facebook: "https://www.facebook.com/share/18WfXH6g4m/",
-    instagram: "https://www.instagram.com/fitnness_coach_megha_shaha?igsh=ZWR2ajd2enlvMmoz",
+    instagram: "https://www.instagram.com/health_coach_megha_shaha?igsh=ZWR2ajd2enlvMmoz",
     youtube: "https://youtube.com/@meghashaha1156?si=fePkXyIeNJDhiesm",
     googleBusiness: "https://g.co/kgs/ezHLMBB"
   };
@@ -52,8 +52,8 @@ const Footer = () => {
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <div className="space-y-2">
               {[
-                { label: "About Dr. Megha", to: "/about" },
-                { label: "Healing Method", to: "/method" },
+                { label: "About Dt. Megha", to: "/about" },
+                { label: "Healing Method", to: "/methods" },
                 { label: "Success Stories", to: "/about" },
                 { label: "Free Resources", to: "/about" },
                 { label: "Programs", to: "/about" },
@@ -177,7 +177,7 @@ const Footer = () => {
 
         <div className="border-t border-border/50 mt-8 pt-8 text-center">
           <p className="text-muted-foreground text-sm">
-  © 2025 Lifelong Wellness by DT. Megha Shaha, Cybexonics IT Consultants Pvt. Ltd.
+  © 2025 Lifelong Wellness by DT. Megha Shaha,
   <br />
   All rights reserved. Heal naturally, live beautifully.
   <br />

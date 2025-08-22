@@ -207,12 +207,12 @@ const Contact = () => {
   {/* Main Clinic */}
 <p className="text-muted-foreground">
   <a 
-    href="https://maps.app.goo.gl/sbPXPywN2GqqVEUE6" 
+    href="https://maps.app.goo.gl/3sH1t8RAaLfwfgx5A" 
     target="_blank" 
     rel="noopener noreferrer" 
     className="hover:text-green-600 underline"
   >
-    Navjeevan Hospital, Tembhurni Road, Kurduwadi
+    Lifelong wellness centre by Megha,kurduvadi 413208
   </a>
 </p>
 <p className="text-muted-foreground">Mo. 9420608032</p>
