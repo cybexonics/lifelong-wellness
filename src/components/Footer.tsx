@@ -118,17 +118,9 @@ const Footer = () => {
                   <MessageCircle className="w-4 h-4" />
                   WhatsApp Support
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full justify-start"
-                  onClick={goToContactPage}
-                >
-                  <Phone className="w-4 h-4" />
-                  Book Consultation
-                </Button>
-              </div>
-
+               
+                 </div>
+                  
               <div className="flex gap-3">
                 <Button 
                   variant="ghost" 
