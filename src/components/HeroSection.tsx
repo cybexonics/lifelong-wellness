@@ -241,11 +241,11 @@ const HeroSection = () => {
               <div className="text-sm text-muted-foreground">Women to be Educated</div>
             </div>
             <div className="space-y-2">
-              <div className="text-3xl font-bold text-secondary-accent">100%</div>
+              <div className="text-3xl font-bold text-[#e56c2f]">100%</div>
               <div className="text-sm text-muted-foreground">Medicine-Free Approach</div>
             </div>
             <div className="space-y-2">
-              <div className="text-3xl font-bold text-accent-warm">24x7</div>
+             <div className="text-3xl font-bold text-[#1f6b3a]">24x7</div>
               <div className="text-sm text-muted-foreground">WhatsApp Support</div>
             </div>
           </div>
