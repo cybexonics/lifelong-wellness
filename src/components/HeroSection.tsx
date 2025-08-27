@@ -98,7 +98,7 @@ const HeroSection = () => {
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-orange-400/80 backdrop-blur-sm text-secondary-foreground px-4 py-2 rounded-full mb-6 animate-fade-in-up">
-            <Heart className="w-4 h-4 text-secondary-accent" />
+           <Heart className="w-4 h-4 text-orange-500" />
             <span className="text-sm font-medium">Transform Your Health Naturally</span>
           </div>
 
