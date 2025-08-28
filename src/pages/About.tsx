@@ -179,7 +179,7 @@ const experience = [
                     all aspects of their lives."
                   </p>
                   <div className="mt-8 text-right">
-                    <p className="font-serif text-xl font-semibold text-primary">- Dt.sMegha Shaha</p>
+                    <p className="font-serif text-xl font-semibold text-primary">- Dt.Megha Shaha</p>
                   </div>
                 </CardContent>
               </Card>

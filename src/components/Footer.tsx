@@ -55,8 +55,7 @@ const Footer = () => {
                 { label: "About Dt. Megha", to: "/about" },
                 { label: "Healing Method", to: "/methods" },
                 { label: "Success Stories", to: "/about" },
-                { label: "Free Resources", to: "/about" },
-                { label: "Programs", to: "/about" },
+                { label: "Programs", to: "/services" },
               ].map((link) => (
                 <div key={link.label}>
                   <Link
