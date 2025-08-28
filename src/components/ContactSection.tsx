@@ -171,7 +171,7 @@ const ContactSection = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg">Email Us</h3>
-                      <p className="text-muted-foreground">info@lifelongwellness.in</p>
+                      <p className="text-muted-foreground">meghahshaha@gmail.com</p>
                     </div>
                   </div>
                 </CardContent>

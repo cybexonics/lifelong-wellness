@@ -155,8 +155,8 @@ const Contact = () => {
                     <Card className="p-6 hover:shadow-elegant transition-shadow duration-300">
                       <CardContent className="p-0">
                         <div className="flex items-center gap-4">
-                          <div className="p-3 bg-secondary-accent/10 rounded-full">
-                            <MessageSquare className="w-6 h-6 text-secondary-accent" />
+                           <div className="p-3 bg-orange-100 rounded-full">
+                            <MessageSquare className="w-6 h-6 text-orange-600" />
                           </div>
                           <div>
     <h3 className="font-semibold mb-1">WhatsApp</h3>
@@ -236,8 +236,8 @@ const Contact = () => {
                     <Card className="p-6 hover:shadow-elegant transition-shadow duration-300">
                       <CardContent className="p-0">
                         <div className="flex items-center gap-4">
-                          <div className="p-3 bg-secondary-accent/10 rounded-full">
-                            <Clock className="w-6 h-6 text-secondary-accent" />
+                           <div className="p-3 bg-orange-100 rounded-full">
+                            <Clock className="w-6 h-6 text-orange-600" />
                           </div>
                           <div>
                             <h3 className="font-semibold mb-1">Working Hours</h3>
