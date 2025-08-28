@@ -457,7 +457,7 @@ const Index = () => {
 
                 <Card className="p-6 text-center hover:shadow-elegant transition-shadow duration-300">
                   <CardContent className="p-0">
-                    <Award className="w-12 h-12 text-secondary-accent mx-auto mb-4" />
+                    <Award className="w-12 h-12 text-orange-500 mx-auto mb-4" />
                     <h3 className="font-serif text-xl font-semibold mb-3">Evidence-Based</h3>
                     <p className="text-muted-foreground">
                       Our methods combine ancient wisdom with modern science, backed by research and proven results.

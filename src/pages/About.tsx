@@ -13,12 +13,14 @@ const About = () => {
     { degree: "Mindfulness & Meditation Certification", institution: "Wellness Academy", year: "2016" }
   ]
 
-  const experience = [
+  
+   
+  
+
+const experience = [
     { role: "Chief Holistic Practitioner", place: "Lifelong Wellness Clinic", years: "2018 - Present" },
     { role: "Senior Wellness Consultant", place: "Natural Health Center", years: "2015 - 2018" },
-   
   ]
-
   const certifications = [
     "Board Certified in Holistic Medicine",
     "Certified Ayurveda Specialist",
@@ -56,7 +58,7 @@ const About = () => {
                       <div className="text-sm text-muted-foreground">Years Experience</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-3xl font-bold text-secondary-accent">5000+</div>
+                      <div className="text-3xl font-bold text-orange-500 mb-2">5000+</div>
                       <div className="text-sm text-muted-foreground">Lives Transformed</div>
                     </div>
                   </div>
@@ -94,7 +96,7 @@ const About = () => {
               </Card>
               <Card className="p-8 hover:shadow-elegant transition-shadow duration-300">
                 <CardContent className="p-0">
-                  <Award className="w-12 h-12 text-secondary-accent mb-4" />
+                  <Award className="w-12 h-12 text-orange-500 mx-auto mb-4" />
                   <h3 className="font-serif text-2xl font-semibold mb-4">Our Vision</h3>
                   <p className="text-muted-foreground leading-relaxed">
                     To create a world where every woman has access to natural, effective healthcare 
@@ -115,7 +117,7 @@ const About = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-16">
-                <Users className="w-16 h-16 text-secondary-accent mx-auto mb-4" />
+               <Users className="w-16 h-16 text-orange-500 mx-auto mb-4" />
                 <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4">Professional Experience</h2>
               </div>
               <div className="space-y-6">

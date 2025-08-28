@@ -112,7 +112,7 @@ const Footer = () => {
                 <Button 
                   variant="wellness" 
                   size="sm" 
-                  className="w-full justify-start"
+                   className="w-full justify-start bg-orange-500 hover:bg-orange-600 text-white"
                   onClick={openWhatsApp}
                 >
                   <MessageCircle className="w-4 h-4" />
