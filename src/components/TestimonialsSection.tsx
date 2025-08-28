@@ -142,7 +142,7 @@ const TestimonialsSection = () => {
               <div className="text-sm text-muted-foreground">Success Rate</div>
             </div>
             <div className="text-center p-6 bg-background/60 backdrop-blur-sm rounded-lg">
-              <div className="text-3xl font-bold text-secondary-accent mb-2">5000+</div>
+<div className="text-3xl font-bold text-orange-500 mb-2">5000+</div>
               <div className="text-sm text-muted-foreground">Lives Transformed</div>
             </div>
             <div className="text-center p-6 bg-background/60 backdrop-blur-sm rounded-lg">
