@@ -164,11 +164,11 @@ const Contact = () => {
       href="https://wa.me/919421069326" 
       target="_blank" 
       rel="noopener noreferrer"
-      className="text-muted-foreground block hover:text-pink-600"
+      className="text-muted-foreground block hover:text-orange-600"
     >
       +91 94210 69326
     </a>
-    <p className="text-pink-600">24×7 Support Available</p>
+    <p className="text-orange-600">24×7 Support Available</p>
   </div>
                         </div>
                       </CardContent>
