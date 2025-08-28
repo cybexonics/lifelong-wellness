@@ -386,16 +386,21 @@ const Contact = () => {
                 <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4">Visit Our Clinic</h2>
                 <p className="text-muted-foreground">Located in the heart of the city for your convenience</p>
               </div>
-              <div className="bg-muted rounded-2xl h-96 flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin className="w-16 h-16 text-primary mx-auto mb-4" />
-                  <h3 className="font-semibold text-lg mb-2">Interactive Map</h3>
-                  <p className="text-muted-foreground">Google Maps integration would be placed here</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+
+<div className="rounded-2xl overflow-hidden shadow-lg">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d458.0226218310565!2d75.4107966!3d18.0911981!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc45dcc43e61edb%3A0xdf0b10ea85919a84!2sLifelong%20wellness%20centre%20by%20Megha!5e1!3m2!1sen!2sin!4v1756410739439!5m2!1sen!2sin"
+          width="100%"
+          height="450"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</section>
       </main>
 
       <Footer />

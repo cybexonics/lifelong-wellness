@@ -411,9 +411,9 @@ const Services = () => {
                 </div>
                 <div className="text-center">
                   <div className="w-16 h-16 bg-secondary-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Heart className="w-8 h-8 text-secondary-accent" />
+                    <Heart className="w-8 h-8 text" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-2">Root Cause Treatment</h3>
+                  <Heart className="w-8 h-8 text-orange-500" />
                   <p className="text-muted-foreground">
                     We address the underlying causes of disease, not just symptoms, for lasting healing.
                   </p>
