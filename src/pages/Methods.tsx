@@ -53,7 +53,7 @@ const Methods = () => {
         "Emotional healing support",
         "Life transition guidance"
       ],
-      color: "text-pink-600"
+      color: "text-orange-600"
     },
     {
       icon: Apple,
@@ -197,7 +197,7 @@ const Methods = () => {
                     </div>
                     <div className="text-center">
                       <div className="w-12 h-12 bg-secondary-accent/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <span className="text-xl font-bold text-secondary-accent">2</span>
+                       <span className="text-xl font-bold text-purple-600">2</span>
                       </div>
                       <h3 className="font-semibold mb-2">Personalization</h3>
                       <p className="text-sm text-muted-foreground">
@@ -239,7 +239,7 @@ const Methods = () => {
                   <div className="text-sm text-muted-foreground">Published Studies</div>
                 </div>
                 <div className="text-center p-6 bg-secondary/10 rounded-lg">
-                  <div className="text-3xl font-bold text-secondary-accent mb-2">5000+</div>
+                      <div className="text-3xl font-bold text-orange-500 mb-2">5000+</div>
                   <div className="text-sm text-muted-foreground">Years of Tradition</div>
                 </div>
                 <div className="text-center p-6 bg-secondary/10 rounded-lg">

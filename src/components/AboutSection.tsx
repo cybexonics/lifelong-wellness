@@ -29,10 +29,10 @@ const AboutSection = () => {
           <div className="space-y-8">
             <div>
               <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">
-                Meet <span className="text-primary">DT. Megha Shaha</span>
+                Meet <span className="text-primary">Dt. Megha Shaha</span>
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                From a gym shutdown during COVID to discovering her true calling — Dr. Megha's journey began with a profound realization that healing comes from within, not from medicine bottles.
+                From a gym shutdown during COVID to discovering her true calling — Dt. Megha's journey began with a profound realization that healing comes from within, not from medicine bottles.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 After losing her mother and witnessing countless women suffer in silence, she dedicated her life to ensuring no woman has to endure chronic pain without hope for natural healing.
