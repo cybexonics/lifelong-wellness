@@ -74,11 +74,11 @@ const Footer = () => {
             <h4 className="font-semibold mb-4">Services</h4>
             <div className="space-y-2">
               {[
-                { label: "PCOS Reversal", to: "/services" },
-                { label: "Fertility Enhancement", to: "/services" },
-                { label: "Weight Management", to: "/services" },
-                { label: "Hormonal Balance", to: "/services" },
-                { label: "Detox Programs", to: "/services" },
+                { label: "PCOS Reversal", to: "/services#pcos-reversal" },
+                { label: "Fertility Enhancement", to: "/services#fertility-enhancement" },
+                { label: "Weight Management", to: "/services#weight-management" },
+                { label: "Hormonal Balance", to: "/services#hormonal-balance" },
+                { label: "Detox Programs", to: "/services#detox-programs" },
               ].map((service) => (
                 <div key={service.label}>
                   <Link
