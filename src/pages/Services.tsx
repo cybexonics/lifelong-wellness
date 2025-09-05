@@ -411,7 +411,7 @@ const Services = () => {
                 </div>
                 <div className="text-center">
                   <div className="w-16 h-16 bg-secondary-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Heart className="w-8 h-8 text" />
+                    
                   </div>
                   <Heart className="w-8 h-8 text-orange-500" />
                   <p className="text-muted-foreground">
