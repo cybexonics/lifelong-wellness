@@ -75,6 +75,37 @@ const experience = [
             </div>
           </div>
         </section>
+        
+        {/* Why This Path */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="font-serif text-3xl md:text-4xl font-bold mb-8">Why I Chose This Healing Path</h2>
+              <Card className="p-8 text-left">
+                <CardContent className="p-0">
+                  <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+                    "My journey into holistic medicine began during my conventional medical training 
+                    when I witnessed the limitations of treating symptoms without addressing root causes. 
+                    I saw patients getting temporary relief but never truly healing."
+                  </p>
+                  <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+                    "This led me to explore ancient healing systems like Ayurveda, mindfulness practices, 
+                    and nutritional medicine. I discovered that when we honor the body's natural wisdom 
+                    and address the whole person - mind, body, and spirit - profound healing becomes possible."
+                  </p>
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    "Today, I'm passionate about empowering women to reclaim their health naturally, 
+                    breaking free from the cycle of dependency on medications and truly thriving in 
+                    all aspects of their lives."
+                  </p>
+                  <div className="mt-8 text-right">
+                    <p className="font-serif text-xl font-semibold text-primary">- Dt.Megha Shaha</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
 
         {/* Mission & Vision */}
         <section className="py-20">
@@ -156,36 +187,7 @@ const experience = [
           </div>
         </section>
 
-        {/* Why This Path */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="font-serif text-3xl md:text-4xl font-bold mb-8">Why I Chose This Healing Path</h2>
-              <Card className="p-8 text-left">
-                <CardContent className="p-0">
-                  <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                    "My journey into holistic medicine began during my conventional medical training 
-                    when I witnessed the limitations of treating symptoms without addressing root causes. 
-                    I saw patients getting temporary relief but never truly healing."
-                  </p>
-                  <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                    "This led me to explore ancient healing systems like Ayurveda, mindfulness practices, 
-                    and nutritional medicine. I discovered that when we honor the body's natural wisdom 
-                    and address the whole person - mind, body, and spirit - profound healing becomes possible."
-                  </p>
-                  <p className="text-lg text-muted-foreground leading-relaxed">
-                    "Today, I'm passionate about empowering women to reclaim their health naturally, 
-                    breaking free from the cycle of dependency on medications and truly thriving in 
-                    all aspects of their lives."
-                  </p>
-                  <div className="mt-8 text-right">
-                    <p className="font-serif text-xl font-semibold text-primary">- Dt.Megha Shaha</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
+
       </main>
 
       <Footer />
