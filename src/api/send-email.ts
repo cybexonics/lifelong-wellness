@@ -73,7 +73,7 @@
 //             <div class="highlight">
 //               <h3>What happens next?</h3>
 //               <ul>
-//                 <li>Dr. Megha Shaha will personally review your request</li>
+//                 <li>Dt. Megha Shaha will personally review your request</li>
 //                 <li>We'll contact you within 24 hours to schedule your ${type === "consultation" ? "free consultation" : "call"}</li>
 //                 <li>You'll receive a confirmation with all the details</li>
 //               </ul>
@@ -91,7 +91,7 @@
 //             <p>We look forward to supporting you in achieving optimal health naturally!</p>
             
 //             <p>With gratitude,<br>
-//             <strong>Dr. Megha Shaha</strong><br>
+//             <strong>Dt. Megha Shaha</strong><br>
 //             Lifelong Wellness</p>
 //           </div>
 //           <div class="footer">
@@ -105,7 +105,7 @@
 
 //     const mailOptions = {
 //       from: {
-//         name: "Dr. Megha Shaha - Lifelong Wellness",
+//         name: "Dt. Megha Shaha - Lifelong Wellness",
 //         address: process.env.EMAIL_USER || "noreply@lifelongwellness.com",
 //       },
 //       to: data.email,

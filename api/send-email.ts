@@ -111,7 +111,7 @@ const createAutoReplyTemplate = (data: {
         <p><strong>Email:</strong> lifelongwellnessmegha@gmail.com</p>
         
         <p>Best regards,<br>
-        <strong>Dr. Megha Shaha</strong><br>
+        <strong>Dt. Megha Shaha</strong><br>
         Lifelong Wellness</p>
       </div>
     </body>

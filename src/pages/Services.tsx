@@ -462,35 +462,3 @@ const Services = () => {
 }
 
 
-
-export default function ServicesPage() {
-  return (
-    <main className="space-y-24">
-      <section id="pcos-reversal" className="scroll-mt-28">  {/* 👈 anchor target */}
-        <h2 className="text-2xl font-semibold">PCOS Reversal</h2>
-        <p>Details about PCOS reversal program…</p>
-      </section>
-
-      <section id="fertility-enhancement" className="scroll-mt-28">
-        <h2 className="text-2xl font-semibold">Fertility Enhancement</h2>
-        <p>Details…</p>
-      </section>
-
-      <section id="weight-management" className="scroll-mt-28">
-        <h2 className="text-2xl font-semibold">Weight Management</h2>
-        <p>Details…</p>
-      </section>
-
-      <section id="hormonal-balance" className="scroll-mt-28">
-        <h2 className="text-2xl font-semibold">Hormonal Balance</h2>
-        <p>Details…</p>
-      </section>
-
-      <section id="detox-programs" className="scroll-mt-28">
-        <h2 className="text-2xl font-semibold">Detox Programs</h2>
-        <p>Details…</p>
-      </section>
-    </main>
-  );
-}
-// export default ServicesPage;
