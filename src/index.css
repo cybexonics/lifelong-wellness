@@ -10,10 +10,6 @@ html {
     scroll-behavior: smooth;
 }
 
-html {
-    scroll-behavior: smooth;
-}
-
 @layer base {
      :root {
         --background: 45 20% 98%;
